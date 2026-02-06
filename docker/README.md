@@ -34,7 +34,7 @@ Open Observability Stack (Doris + OTel + Grafana) 是一个完整的可观测性
                           ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                     Apache Doris (All-in-One)                          │
-│                      apache/doris:3.0.5-all                            │
+│                      apache/doris:3.0.8-all                            │
 │                                                                         │
 │  FE HTTP:  8030 (Web UI)                                               │
 │  FE MySQL: 9030 (Query Protocol)                                       │
@@ -143,7 +143,7 @@ docker compose ps
 
 ```bash
 # Doris 镜像版本
-DORIS_IMAGE=apache/doris:3.0.5-all
+DORIS_IMAGE=apache/doris:3.0.8-all
 
 # 端口映射
 DORIS_FE_HTTP_PORT=8030
@@ -172,7 +172,7 @@ exporters:
 ```yaml
 services:
   doris:
-    image: ${DORIS_IMAGE:-apache/doris:3.0.5-all}
+    image: ${DORIS_IMAGE:-apache/doris:3.0.8-all}
     environment:
       - SKIP_CHECK_ULIMIT=true
       - TZ=Asia/Shanghai  # 添加此行
