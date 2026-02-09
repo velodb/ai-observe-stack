@@ -1,0 +1,813 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_DORIS",
+      "label": "Doris",
+      "description": "Doris MySQL compatible data source",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "description": "Host metrics dashboard for Node Exporter metrics stored in Apache Doris via OpenTelemetry Collector",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "id": 1,
+      "title": "CPU Usage %",
+      "type": "stat",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 85 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  100 * (1 - AVG(\n    CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n      THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n      ELSE NULL END\n  )) as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['cpu'] AS VARCHAR) as cpu_id,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['cpu'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['cpu'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_cpu_seconds_total'\n    AND CAST(attributes['mode'] AS VARCHAR) = 'idle'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nGROUP BY t.timestamp\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Memory Usage %",
+      "type": "stat",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  100 * (1 - SUM(CASE WHEN metric_name = 'node_memory_MemAvailable_bytes' THEN value END)\n           / SUM(CASE WHEN metric_name = 'node_memory_MemTotal_bytes' THEN value END)) as value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_memory_MemTotal_bytes', 'node_memory_MemAvailable_bytes')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nGROUP BY timestamp\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Load Average (1m)",
+      "type": "stat",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 4 },
+              { "color": "red", "value": 8 }
+            ]
+          },
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name = 'node_load1'\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Root Disk Usage %",
+      "type": "stat",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "textMode": "auto",
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  100 * (1 - SUM(CASE WHEN metric_name = 'node_filesystem_avail_bytes' THEN value END)\n           / SUM(CASE WHEN metric_name = 'node_filesystem_size_bytes' THEN value END)) as value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_filesystem_size_bytes', 'node_filesystem_avail_bytes')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND attributes['mountpoint'] = '/'\n  AND $__timeFilter(timestamp)\nGROUP BY timestamp\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "panels": [],
+      "title": "CPU",
+      "type": "row"
+    },
+    {
+      "id": 5,
+      "title": "CPU Usage % Over Time",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  t.service_instance_id as metric,\n  100 * (1 - AVG(\n    CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n      THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n      ELSE NULL END\n  )) as value\nFROM (\n  SELECT \n    timestamp,\n    service_instance_id,\n    CAST(attributes['cpu'] AS VARCHAR) as cpu_id,\n    value,\n    LAG(value) OVER (PARTITION BY service_instance_id, CAST(attributes['cpu'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY service_instance_id, CAST(attributes['cpu'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_cpu_seconds_total'\n    AND CAST(attributes['mode'] AS VARCHAR) = 'idle'\n    AND service_name = '$service_name'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nGROUP BY t.timestamp, t.service_instance_id\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "CPU Usage by Mode",
+      "description": "Per-mode CPU usage for selected instance, stacked to 100%",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "normal" }
+          },
+          "unit": "percent",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  t.mode as metric,\n  AVG(\n    CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n      THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n      ELSE NULL END\n  ) * 100 as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['cpu'] AS VARCHAR) as cpu_id,\n    CAST(attributes['mode'] AS VARCHAR) as mode,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['cpu'] AS VARCHAR), CAST(attributes['mode'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['cpu'] AS VARCHAR), CAST(attributes['mode'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_cpu_seconds_total'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND CAST(attributes['mode'] AS VARCHAR) NOT IN ('idle')\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nGROUP BY t.timestamp, t.mode\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 102,
+      "panels": [],
+      "title": "Memory",
+      "type": "row"
+    },
+    {
+      "id": 7,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  CASE metric_name\n    WHEN 'node_memory_MemTotal_bytes' THEN 'Total'\n    WHEN 'node_memory_MemAvailable_bytes' THEN 'Available'\n    WHEN 'node_memory_MemFree_bytes' THEN 'Free'\n    WHEN 'node_memory_Cached_bytes' THEN 'Cached'\n    WHEN 'node_memory_Buffers_bytes' THEN 'Buffers'\n  END as metric,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_memory_MemTotal_bytes', 'node_memory_MemAvailable_bytes', 'node_memory_MemFree_bytes', 'node_memory_Cached_bytes', 'node_memory_Buffers_bytes')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Memory Usage %",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  service_instance_id as metric,\n  100 * (1 - SUM(CASE WHEN metric_name = 'node_memory_MemAvailable_bytes' THEN value END)\n           / SUM(CASE WHEN metric_name = 'node_memory_MemTotal_bytes' THEN value END)) as value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_memory_MemTotal_bytes', 'node_memory_MemAvailable_bytes')\n  AND service_name = '$service_name'\n  AND $__timeFilter(timestamp)\nGROUP BY timestamp, service_instance_id\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 103,
+      "panels": [],
+      "title": "System Load",
+      "type": "row"
+    },
+    {
+      "id": 9,
+      "title": "Load Average",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  CASE metric_name\n    WHEN 'node_load1' THEN 'load1'\n    WHEN 'node_load5' THEN 'load5'\n    WHEN 'node_load15' THEN 'load15'\n  END as metric,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_load1', 'node_load5', 'node_load15')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Open File Descriptors",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  timestamp as time,\n  CASE metric_name\n    WHEN 'node_filefd_allocated' THEN 'Allocated'\n    WHEN 'node_filefd_maximum' THEN 'Maximum'\n  END as metric,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_filefd_allocated', 'node_filefd_maximum')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 104,
+      "panels": [],
+      "title": "Disk",
+      "type": "row"
+    },
+    {
+      "id": 11,
+      "title": "Disk Space Usage",
+      "description": "Current disk space usage per filesystem",
+      "type": "table",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 33 },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Used %" },
+            "properties": [
+              { "id": "unit", "value": "percent" },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "yellow", "value": 70 },
+                    { "color": "red", "value": 90 }
+                  ]
+                }
+              },
+              { "id": "custom.displayMode", "value": "color-background-solid" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Total" },
+            "properties": [{ "id": "unit", "value": "bytes" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Available" },
+            "properties": [{ "id": "unit", "value": "bytes" }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Used" },
+            "properties": [{ "id": "unit", "value": "bytes" }]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Used %", "desc": true }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "table",
+          "rawSql": "SELECT \n  CAST(attributes['mountpoint'] AS VARCHAR) as `Mount Point`,\n  CAST(attributes['device'] AS VARCHAR) as `Device`,\n  CAST(attributes['fstype'] AS VARCHAR) as `FS Type`,\n  MAX(CASE WHEN metric_name = 'node_filesystem_size_bytes' THEN value END) as `Total`,\n  MAX(CASE WHEN metric_name = 'node_filesystem_avail_bytes' THEN value END) as `Available`,\n  MAX(CASE WHEN metric_name = 'node_filesystem_size_bytes' THEN value END) - MAX(CASE WHEN metric_name = 'node_filesystem_avail_bytes' THEN value END) as `Used`,\n  ROUND(100 * (1 - MAX(CASE WHEN metric_name = 'node_filesystem_avail_bytes' THEN value END)\n           / MAX(CASE WHEN metric_name = 'node_filesystem_size_bytes' THEN value END)), 1) as `Used %`\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_filesystem_size_bytes', 'node_filesystem_avail_bytes')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND CAST(attributes['fstype'] AS VARCHAR) IN ('ext4', 'xfs', 'btrfs')\n  AND timestamp = (\n    SELECT MAX(timestamp) FROM otel.otel_metrics_gauge\n    WHERE metric_name = 'node_filesystem_size_bytes'\n      AND service_name = '$service_name'\n      AND service_instance_id = '$instance'\n      AND $__timeFilter(timestamp)\n  )\nGROUP BY CAST(attributes['mountpoint'] AS VARCHAR), CAST(attributes['device'] AS VARCHAR), CAST(attributes['fstype'] AS VARCHAR)\nORDER BY `Used %` DESC",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Disk I/O - Read Throughput",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' read') as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_disk_read_bytes_total'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Disk I/O - Write Throughput",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' write') as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_disk_written_bytes_total'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 },
+      "id": 105,
+      "panels": [],
+      "title": "Network",
+      "type": "row"
+    },
+    {
+      "id": 14,
+      "title": "Network Traffic - Receive",
+      "description": "Network receive bytes per second (excluding virtual interfaces)",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 49 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' receive') as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_network_receive_bytes_total'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'veth%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'br-%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'docker%'\n    AND CAST(attributes['device'] AS VARCHAR) != 'lo'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Network Traffic - Transmit",
+      "description": "Network transmit bytes per second (excluding virtual interfaces)",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 49 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' transmit') as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    value,\n    LAG(value) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name = 'node_network_transmit_bytes_total'\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'veth%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'br-%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'docker%'\n    AND CAST(attributes['device'] AS VARCHAR) != 'lo'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "Network Errors - Receive",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 57 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' ', t.type) as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    metric_name,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    CASE WHEN metric_name = 'node_network_receive_errs_total' THEN 'rx_errors'\n         WHEN metric_name = 'node_network_receive_drop_total' THEN 'rx_drops'\n    END as type,\n    value,\n    LAG(value) OVER (PARTITION BY metric_name, CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY metric_name, CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name IN ('node_network_receive_errs_total', 'node_network_receive_drop_total')\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'veth%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'br-%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'docker%'\n    AND CAST(attributes['device'] AS VARCHAR) != 'lo'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "title": "Network Errors - Transmit",
+      "type": "timeseries",
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 57 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": { "group": "A", "mode": "none" }
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+          "format": "time_series",
+          "rawSql": "SELECT \n  t.timestamp as time,\n  CONCAT(t.device, ' ', t.type) as metric,\n  CASE WHEN UNIX_TIMESTAMP(t.timestamp) > UNIX_TIMESTAMP(t.prev_ts) AND t.value >= t.prev_value\n    THEN (t.value - t.prev_value) / (UNIX_TIMESTAMP(t.timestamp) - UNIX_TIMESTAMP(t.prev_ts))\n    ELSE NULL END as value\nFROM (\n  SELECT \n    timestamp,\n    metric_name,\n    CAST(attributes['device'] AS VARCHAR) as device,\n    CASE WHEN metric_name = 'node_network_transmit_errs_total' THEN 'tx_errors'\n         WHEN metric_name = 'node_network_transmit_drop_total' THEN 'tx_drops'\n    END as type,\n    value,\n    LAG(value) OVER (PARTITION BY metric_name, CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_value,\n    LAG(timestamp) OVER (PARTITION BY metric_name, CAST(attributes['device'] AS VARCHAR) ORDER BY timestamp) as prev_ts\n  FROM otel.otel_metrics_sum\n  WHERE metric_name IN ('node_network_transmit_errs_total', 'node_network_transmit_drop_total')\n    AND service_name = '$service_name'\n    AND service_instance_id = '$instance'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'veth%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'br-%'\n    AND CAST(attributes['device'] AS VARCHAR) NOT LIKE 'docker%'\n    AND CAST(attributes['device'] AS VARCHAR) != 'lo'\n    AND $__timeFilter(timestamp)\n) t\nWHERE t.prev_ts IS NOT NULL\nORDER BY time",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["host", "node-exporter", "doris", "otel"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "definition": "SELECT DISTINCT service_name FROM otel.otel_metrics_gauge WHERE service_name != '' AND service_name IS NOT NULL AND $__timeFilter(timestamp) ORDER BY service_name",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Service",
+        "multi": false,
+        "name": "service_name",
+        "options": [],
+        "query": "SELECT DISTINCT service_name FROM otel.otel_metrics_gauge WHERE service_name != '' AND service_name IS NOT NULL AND $__timeFilter(timestamp) ORDER BY service_name",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "definition": "SELECT DISTINCT service_instance_id FROM otel.otel_metrics_gauge WHERE service_name = '$service_name' AND service_instance_id != '' AND $__timeFilter(timestamp) ORDER BY service_instance_id",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Instance",
+        "multi": false,
+        "name": "instance",
+        "options": [],
+        "query": "SELECT DISTINCT service_instance_id FROM otel.otel_metrics_gauge WHERE service_name = '$service_name' AND service_instance_id != '' AND $__timeFilter(timestamp) ORDER BY service_instance_id",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Host Metrics - Node Exporter (Doris)",
+  "uid": "doris-host-metrics",
+  "version": 1
+}

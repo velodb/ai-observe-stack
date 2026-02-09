@@ -1,0 +1,390 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_DORIS",
+      "label": "Doris",
+      "description": "Doris/MySQL datasource for JVM metrics",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "options": {
+        "content": "# JVM Monitoring Dashboard\nOpenTelemetry Java Agent → Doris Exporter → Apache Doris → Grafana",
+        "mode": "markdown"
+      },
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 70 },
+            { "color": "red", "value": 90 }
+          ]},
+          "unit": "percent",
+          "min": 0, "max": 100
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 2 },
+      "id": 10,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "table",
+        "rawQuery": true,
+        "rawSql": "SELECT (SUM(CASE WHEN metric_name='jvm.memory.used' AND attributes['jvm.memory.type']='heap' THEN value ELSE 0 END) / NULLIF(SUM(CASE WHEN metric_name='jvm.memory.limit' AND attributes['jvm.memory.type']='heap' THEN value ELSE 0 END), 0)) * 100 as value FROM otel.otel_metrics_sum WHERE service_name='$service_name' AND metric_name IN ('jvm.memory.used', 'jvm.memory.limit') AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_sum WHERE service_name='$service_name')",
+        "refId": "A"
+      }],
+      "title": "Heap Usage %",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "Full GC 次数，频繁 Full GC 是严重问题",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 5 },
+            { "color": "red", "value": 10 }
+          ]},
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 2 },
+      "id": 12,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "table",
+        "rawQuery": true,
+        "rawSql": "WITH gc_data AS (SELECT timestamp, SUM(count) as total_count FROM otel.otel_metrics_histogram WHERE metric_name='jvm.gc.duration' AND service_name='$service_name' AND (attributes['jvm.gc.name'] LIKE '%Old%' OR attributes['jvm.gc.action'] LIKE '%major%') AND $__timeFilter(timestamp) GROUP BY timestamp ORDER BY timestamp), gc_delta AS (SELECT timestamp, total_count - LAG(total_count) OVER (ORDER BY timestamp) as delta_count FROM gc_data) SELECT COALESCE(SUM(delta_count), 0) as value FROM gc_delta WHERE delta_count > 0",
+        "refId": "A"
+      }],
+      "title": "Full GC Count",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 50 },
+            { "color": "red", "value": 80 }
+          ]},
+          "unit": "percent",
+          "min": 0, "max": 100
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 2 },
+      "id": 13,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "table",
+        "rawQuery": true,
+        "rawSql": "SELECT value * 100 as value FROM otel.otel_metrics_gauge WHERE metric_name='jvm.cpu.recent_utilization' AND service_name='$service_name' ORDER BY timestamp DESC LIMIT 1",
+        "refId": "A"
+      }],
+      "title": "CPU Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [
+            { "color": "green", "value": null },
+            { "color": "yellow", "value": 100 },
+            { "color": "red", "value": 200 }
+          ]},
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 2 },
+      "id": 14,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "table",
+        "rawQuery": true,
+        "rawSql": "SELECT SUM(value) as value FROM otel.otel_metrics_sum WHERE metric_name='jvm.thread.count' AND service_name='$service_name' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_sum WHERE service_name='$service_name' AND metric_name='jvm.thread.count')",
+        "refId": "A"
+      }],
+      "title": "Thread Count",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "总 Heap 内存使用量",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "green", "mode": "fixed" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "decmbytes"
+        }
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 6 },
+      "id": 1,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'Heap Used' as metric, SUM(value) / 1048576 as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.memory.used' AND service_name = '$service_name' AND attributes['jvm.memory.type'] = 'heap' AND $__timeFilter(timestamp) GROUP BY timestamp ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "Heap Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "Non-Heap 内存使用量（Metaspace、CodeCache 等）",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "purple", "mode": "fixed" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "decmbytes"
+        }
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 6, "y": 6 },
+      "id": 15,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'Non-Heap Used' as metric, SUM(value) / 1048576 as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.memory.used' AND service_name = '$service_name' AND attributes['jvm.memory.type'] = 'non_heap' AND $__timeFilter(timestamp) GROUP BY timestamp ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "Non-Heap Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "GC Duration - Young GC (绿色) vs Full GC (红色)",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "mappings": [],
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": ".*Old.*|.*Full.*" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": ".*Young.*" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 12, "y": 6 },
+      "id": 3,
+      "options": { "legend": { "calcs": ["sum", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "WITH gc_raw AS (SELECT timestamp, CAST(attributes['jvm.gc.name'] AS VARCHAR) as gc_name, sum, count FROM otel.otel_metrics_histogram WHERE metric_name = 'jvm.gc.duration' AND service_name = '$service_name' AND $__timeFilter(timestamp)), gc_delta AS (SELECT timestamp, gc_name, sum - LAG(sum) OVER (PARTITION BY gc_name ORDER BY timestamp) as delta_sum, count - LAG(count) OVER (PARTITION BY gc_name ORDER BY timestamp) as delta_count FROM gc_raw) SELECT UNIX_TIMESTAMP(timestamp) as time_sec, gc_name as metric, delta_sum * 1000 as value FROM gc_delta WHERE delta_count > 0 ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "GC Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "每个时间段内 Young GC 和 Full GC 的发生次数",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": ".*Old.*|.*Full.*|.*Major.*" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": ".*Young.*|.*Minor.*" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 18, "y": 6 },
+      "id": 19,
+      "options": { "legend": { "calcs": ["sum", "last"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "WITH gc_raw AS (SELECT timestamp, CAST(attributes['jvm.gc.name'] AS VARCHAR) as gc_name, count FROM otel.otel_metrics_histogram WHERE metric_name = 'jvm.gc.duration' AND service_name = '$service_name' AND $__timeFilter(timestamp)), gc_delta AS (SELECT timestamp, gc_name, count - LAG(count) OVER (PARTITION BY gc_name ORDER BY timestamp) as delta_count FROM gc_raw) SELECT UNIX_TIMESTAMP(timestamp) as time_sec, gc_name as metric, delta_count as value FROM gc_delta WHERE delta_count > 0 ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "GC Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "Old Gen 持续上涨是内存泄漏的关键信号",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "orange", "mode": "fixed" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "decmbytes"
+        }
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 13 },
+      "id": 16,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'G1 Old Gen' as metric, value / 1048576 as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.memory.used' AND service_name = '$service_name' AND attributes['jvm.memory.pool.name'] = 'G1 Old Gen' AND $__timeFilter(timestamp) ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "Old Gen Size (Memory Leak Indicator)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "Eden 锯齿状波动是正常的，频率反映对象分配速率",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "green", "mode": "fixed" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "decmbytes"
+        }
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 13 },
+      "id": 17,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'G1 Eden Space' as metric, value / 1048576 as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.memory.used' AND service_name = '$service_name' AND attributes['jvm.memory.pool.name'] = 'G1 Eden Space' AND $__timeFilter(timestamp) ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "Eden Space Size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "description": "Survivor 空间，存放经历过 Young GC 但未晋升到 Old Gen 的对象",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "blue", "mode": "fixed" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "decmbytes"
+        }
+      },
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 13 },
+      "id": 18,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'G1 Survivor Space' as metric, value / 1048576 as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.memory.used' AND service_name = '$service_name' AND attributes['jvm.memory.pool.name'] = 'G1 Survivor Space' AND $__timeFilter(timestamp) ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "Survivor Space Size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 20 },
+      "id": 2,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, CONCAT('daemon=', CAST(attributes['jvm.thread.daemon'] AS INT)) as metric, SUM(value) as value FROM otel.otel_metrics_sum WHERE metric_name = 'jvm.thread.count' AND service_name = '$service_name' AND $__timeFilter(timestamp) GROUP BY timestamp, CAST(attributes['jvm.thread.daemon'] AS INT) ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "JVM Thread Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": true, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "max": 1, "min": 0,
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 20 },
+      "id": 4,
+      "options": { "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "format": "time_series",
+        "rawQuery": true,
+        "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) as time_sec, 'CPU Utilization' as metric, value as value FROM otel.otel_metrics_gauge WHERE metric_name = 'jvm.cpu.recent_utilization' AND service_name = '$service_name' AND $__timeFilter(timestamp) ORDER BY timestamp",
+        "refId": "A"
+      }],
+      "title": "JVM CPU Utilization",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["jvm", "opentelemetry", "doris"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
+        "definition": "SELECT DISTINCT service_name FROM otel.otel_metrics_sum WHERE service_name != '' AND service_name IS NOT NULL AND $__timeFilter(timestamp) ORDER BY service_name",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Service",
+        "multi": false,
+        "name": "service_name",
+        "options": [],
+        "query": "SELECT DISTINCT service_name FROM otel.otel_metrics_sum WHERE service_name != '' AND service_name IS NOT NULL AND $__timeFilter(timestamp) ORDER BY service_name",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "title": "JVM Monitoring Dashboard",
+  "uid": "jvm-monitoring-doris",
+  "version": 2
+}

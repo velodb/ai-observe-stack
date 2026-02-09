@@ -1,0 +1,570 @@
+{
+  "annotations": { "list": [] },
+  "description": "Kubernetes Observability Dashboard powered by Apache Doris",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Cluster Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 70 }, { "color": "red", "value": 90 }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 22,
+      "options": {
+        "displayMode": "basic",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT 100.0 * SUM(CASE WHEN CAST(attributes['state'] AS VARCHAR) = 'used' THEN value ELSE 0 END) / SUM(value) AS 'Memory' FROM otel.otel_metrics_sum WHERE metric_name = 'system.memory.usage' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_sum WHERE metric_name = 'system.memory.usage' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Usage",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 70 }, { "color": "red", "value": 90 }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 23,
+      "options": {
+        "displayMode": "basic",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT 100.0 * SUM(CASE WHEN CAST(attributes['state'] AS VARCHAR) = 'used' THEN value ELSE 0 END) / SUM(value) AS 'Disk' FROM otel.otel_metrics_sum WHERE metric_name = 'system.filesystem.usage' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_sum WHERE metric_name = 'system.filesystem.usage' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Usage",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 2, "x": 8, "y": 1 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(DISTINCT CAST(resource_attributes['k8s.node.name'] AS VARCHAR)) as value FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.node.condition_ready' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.node.condition_ready' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Nodes",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 2, "x": 10, "y": 1 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(DISTINCT CAST(resource_attributes['k8s.pod.name'] AS VARCHAR)) as value FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.pod.phase' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.pod.phase' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Pods",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 5 }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 2, "x": 12, "y": 1 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COALESCE(SUM(value), 0) as value FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.container.restarts' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.container.restarts' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Restarts",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "namespace" }, "properties": [{ "id": "custom.width", "value": 140 }] },
+          { "matcher": { "id": "byName", "options": "pods" }, "properties": [{ "id": "custom.width", "value": 50 }] },
+          { "matcher": { "id": "byName", "options": "containers" }, "properties": [{ "id": "custom.width", "value": 75 }] }
+        ]
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 14, "y": 1 },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  CAST(resource_attributes['k8s.namespace.name'] AS VARCHAR) AS namespace,\n  COUNT(DISTINCT CAST(resource_attributes['k8s.pod.name'] AS VARCHAR)) AS pods,\n  COUNT(DISTINCT CAST(resource_attributes['k8s.container.name'] AS VARCHAR)) AS containers\nFROM otel.otel_metrics_gauge \nWHERE metric_name = 'k8s.container.ready'\n  AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.container.ready' AND timestamp >= FROM_UNIXTIME($__from/1000))\nGROUP BY 1\nORDER BY pods DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Namespace Statistics",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } },
+          "mappings": []
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Running" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Pending" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Failed" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Succeeded" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 4, "w": 5, "x": 19, "y": 1 },
+      "id": 21,
+      "options": {
+        "displayLabels": ["name", "value"],
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true, "values": ["value"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT SUM(CASE WHEN value = 2 THEN 1 ELSE 0 END) AS Running, SUM(CASE WHEN value = 1 THEN 1 ELSE 0 END) AS Pending, SUM(CASE WHEN value = 3 THEN 1 ELSE 0 END) AS Succeeded, SUM(CASE WHEN value = 4 THEN 1 ELSE 0 END) AS Failed FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.pod.phase' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.pod.phase' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Pod Phase",
+      "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "panels": [],
+      "title": "Resource Trends",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 6 },
+      "id": 7,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) AS time, REPLACE(metric_name, 'system.cpu.load_average.', '') AS metric, AVG(value) AS value FROM otel.otel_metrics_gauge WHERE metric_name LIKE 'system.cpu.load_average%' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Load Average",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "bytes"
+        },
+        "overrides": [{ "matcher": { "id": "byName", "options": "used" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }]
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 6 },
+      "id": 8,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT UNIX_TIMESTAMP(timestamp) AS time, 'used' AS metric, AVG(value) AS value FROM otel.otel_metrics_sum WHERE metric_name = 'system.memory.usage' AND CAST(attributes['state'] AS VARCHAR) = 'used' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "Bps"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "transmit" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "receive" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 6 },
+      "id": 9,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT time, metric, GREATEST(0, value - LAG(value) OVER (PARTITION BY metric ORDER BY time)) / GREATEST(1, time - LAG(time) OVER (PARTITION BY metric ORDER BY time)) AS value FROM (SELECT UNIX_TIMESTAMP(timestamp) AS time, CAST(attributes['direction'] AS VARCHAR) AS metric, SUM(value) AS value FROM otel.otel_metrics_sum WHERE metric_name = 'system.network.io' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY 1, 2) t ORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "Network I/O",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+      "id": 102,
+      "panels": [],
+      "title": "Workload Details",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "mappings": [
+            { "options": { "1": { "color": "green", "index": 0, "text": "Ready" } }, "type": "value" },
+            { "options": { "0": { "color": "red", "index": 1, "text": "Not Ready" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "node" }, "properties": [{ "id": "custom.width", "value": 200 }] },
+          { "matcher": { "id": "byName", "options": "status" }, "properties": [{ "id": "custom.cellOptions", "value": { "mode": "basic", "type": "color-background" } }, { "id": "custom.width", "value": 80 }] }
+        ]
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 13 },
+      "id": 20,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CAST(resource_attributes['k8s.node.name'] AS VARCHAR) AS node, value AS status FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.node.condition_ready' AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.node.condition_ready' AND timestamp >= FROM_UNIXTIME($__from/1000))",
+          "refId": "A"
+        }
+      ],
+      "title": "Node Status",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "namespace" }, "properties": [{ "id": "custom.width", "value": 130 }] },
+          { "matcher": { "id": "byName", "options": "deployment" }, "properties": [{ "id": "custom.width", "value": 250 }] },
+          { "matcher": { "id": "byName", "options": "available" }, "properties": [{ "id": "custom.width", "value": 70 }] },
+          { "matcher": { "id": "byName", "options": "desired" }, "properties": [{ "id": "custom.width", "value": 70 }] }
+        ]
+      },
+      "gridPos": { "h": 5, "w": 9, "x": 6, "y": 13 },
+      "id": 30,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CAST(resource_attributes['k8s.namespace.name'] AS VARCHAR) AS namespace, CAST(resource_attributes['k8s.deployment.name'] AS VARCHAR) AS deployment, MAX(CASE WHEN metric_name = 'k8s.deployment.available' THEN value END) AS available, MAX(CASE WHEN metric_name = 'k8s.deployment.desired' THEN value END) AS desired FROM otel.otel_metrics_gauge WHERE metric_name IN ('k8s.deployment.available', 'k8s.deployment.desired') AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.deployment.available' AND timestamp >= FROM_UNIXTIME($__from/1000)) GROUP BY 1, 2 ORDER BY namespace, deployment",
+          "refId": "A"
+        }
+      ],
+      "title": "Deployments",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "namespace" }, "properties": [{ "id": "custom.width", "value": 130 }] },
+          { "matcher": { "id": "byName", "options": "daemonset" }, "properties": [{ "id": "custom.width", "value": 280 }] },
+          { "matcher": { "id": "byName", "options": "ready" }, "properties": [{ "id": "custom.width", "value": 60 }] },
+          { "matcher": { "id": "byName", "options": "desired" }, "properties": [{ "id": "custom.width", "value": 60 }] }
+        ]
+      },
+      "gridPos": { "h": 5, "w": 9, "x": 15, "y": 13 },
+      "id": 32,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CAST(resource_attributes['k8s.namespace.name'] AS VARCHAR) AS namespace, CAST(resource_attributes['k8s.daemonset.name'] AS VARCHAR) AS daemonset, MAX(CASE WHEN metric_name = 'k8s.daemonset.ready_nodes' THEN value END) AS ready, MAX(CASE WHEN metric_name = 'k8s.daemonset.desired_scheduled_nodes' THEN value END) AS desired FROM otel.otel_metrics_gauge WHERE metric_name IN ('k8s.daemonset.ready_nodes', 'k8s.daemonset.desired_scheduled_nodes') AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.daemonset.ready_nodes' AND timestamp >= FROM_UNIXTIME($__from/1000)) GROUP BY 1, 2 ORDER BY namespace, daemonset",
+          "refId": "A"
+        }
+      ],
+      "title": "DaemonSets",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "id": 103,
+      "panels": [],
+      "title": "Pod Resources",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 3 }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "namespace" }, "properties": [{ "id": "custom.width", "value": 130 }] },
+          { "matcher": { "id": "byName", "options": "pod" }, "properties": [{ "id": "custom.width", "value": 350 }] },
+          { "matcher": { "id": "byName", "options": "restarts" }, "properties": [{ "id": "custom.cellOptions", "value": { "mode": "basic", "type": "color-background" } }, { "id": "custom.width", "value": 70 }] },
+          { "matcher": { "id": "byName", "options": "cpu_req" }, "properties": [{ "id": "unit", "value": "short" }, { "id": "custom.width", "value": 80 }] },
+          { "matcher": { "id": "byName", "options": "mem_req" }, "properties": [{ "id": "unit", "value": "bytes" }, { "id": "custom.width", "value": 100 }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 19 },
+      "id": 31,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "mysql", "uid": "${datasource}" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT CAST(resource_attributes['k8s.namespace.name'] AS VARCHAR) AS namespace, CAST(resource_attributes['k8s.pod.name'] AS VARCHAR) AS pod, MAX(CASE WHEN metric_name = 'k8s.container.restarts' THEN value END) AS restarts, SUM(CASE WHEN metric_name = 'k8s.container.cpu_request' THEN value END) AS cpu_req, SUM(CASE WHEN metric_name = 'k8s.container.memory_request' THEN value END) AS mem_req FROM otel.otel_metrics_gauge WHERE metric_name IN ('k8s.container.restarts', 'k8s.container.cpu_request', 'k8s.container.memory_request') AND timestamp = (SELECT MAX(timestamp) FROM otel.otel_metrics_gauge WHERE metric_name = 'k8s.container.restarts' AND timestamp >= FROM_UNIXTIME($__from/1000)) GROUP BY 1, 2 ORDER BY restarts DESC, namespace, pod",
+          "refId": "A"
+        }
+      ],
+      "title": "Pod Resource Details",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["kubernetes", "otel", "doris"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Data Source",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "mysql",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "K8s Observability - Doris",
+  "uid": "k8s-otel-doris",
+  "version": 1,
+  "weekStart": ""
+}

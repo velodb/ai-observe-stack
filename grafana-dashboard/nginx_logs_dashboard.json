@@ -1,0 +1,265 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 2,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT COUNT(*) as total FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000)", "refId": "A" }],
+      "title": "Access Requests",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "orange", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT COUNT(*) as total FROM ${table} WHERE log_attributes['log_type'] = 'nginx_error' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000)", "refId": "A" }],
+      "title": "Error Logs",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT COUNT(*) as errors FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND CAST(log_attributes['status'] AS INT) >= 500 AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000)", "refId": "A" }],
+      "title": "5xx Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 10 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "textMode": "auto" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT COUNT(*) as errors FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND CAST(log_attributes['status'] AS INT) >= 400 AND CAST(log_attributes['status'] AS INT) < 500 AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000)", "refId": "A" }],
+      "title": "4xx Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 6,
+      "options": { "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "values": true } },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(log_attributes['status'] AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "Status Codes",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" } } },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 7,
+      "options": { "legend": { "displayMode": "list", "placement": "right", "showLegend": true }, "pieType": "pie", "reduceOptions": { "calcs": ["lastNotNull"], "values": true } },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(log_attributes['level'] AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_error' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "Error Levels",
+      "type": "piechart"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 8,
+      "title": "Trends",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1, "pointSize": 5, "showPoints": "auto", "stacking": { "mode": "none" } },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 9,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "time_series", "rawSql": "SELECT UNIX_TIMESTAMP(DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:00')) * 1000 as time, COUNT(*) as requests FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY time ORDER BY time", "refId": "A" }],
+      "title": "Access Requests Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1, "pointSize": 5, "showPoints": "auto", "stacking": { "mode": "none" } },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 10,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "time_series", "rawSql": "SELECT UNIX_TIMESTAMP(DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:00')) * 1000 as time, COUNT(*) as errors FROM ${table} WHERE log_attributes['log_type'] = 'nginx_error' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY time ORDER BY time", "refId": "A" }],
+      "title": "Error Logs Over Time",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 11,
+      "title": "Access Log Analysis",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 15 },
+      "id": 12,
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "values": true }, "showUnfilled": true },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(SUBSTRING_INDEX(log_attributes['request_uri'], '?', 1) AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "Top URLs",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 15 },
+      "id": 13,
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "values": true }, "showUnfilled": true },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(log_attributes['remote_addr'] AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "Top Client IPs",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 15 },
+      "id": 14,
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "values": true }, "showUnfilled": true },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(log_attributes['method'] AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "HTTP Methods",
+      "type": "bargauge"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 15,
+      "title": "Error Log Analysis",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }] } } },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+      "id": 16,
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "values": true }, "showUnfilled": true },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT CAST(SUBSTR(log_attributes['message'], 1, 100) AS VARCHAR) as name, COUNT(*) as value FROM ${table} WHERE log_attributes['log_type'] = 'nginx_error' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) GROUP BY name ORDER BY value DESC LIMIT 10", "refId": "A" }],
+      "title": "Top Error Messages",
+      "type": "bargauge"
+    },
+    {
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 17,
+      "title": "Recent Logs",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "custom": { "filterable": true } } },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 33 },
+      "id": 18,
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT timestamp, CAST(log_attributes['remote_addr'] AS VARCHAR) as client_ip, CAST(log_attributes['method'] AS VARCHAR) as method, CAST(log_attributes['request_uri'] AS VARCHAR) as uri, CAST(log_attributes['status'] AS VARCHAR) as status, CAST(log_attributes['body_bytes_sent'] AS VARCHAR) as bytes FROM ${table} WHERE log_attributes['log_type'] = 'nginx_access' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) ORDER BY timestamp DESC LIMIT 100", "refId": "A" }],
+      "title": "Recent Access Logs",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "mysql", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "custom": { "filterable": true } } },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 43 },
+      "id": 19,
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "targets": [{ "datasource": { "type": "mysql", "uid": "${datasource}" }, "format": "table", "rawSql": "SELECT timestamp, severity_text as level, CAST(log_attributes['message'] AS VARCHAR) as message FROM ${table} WHERE log_attributes['log_type'] = 'nginx_error' AND service_name = '$service_name' AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) ORDER BY timestamp DESC LIMIT 100", "refId": "A" }],
+      "title": "Recent Error Logs",
+      "type": "table"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["nginx", "logs", "opentelemetry", "doris"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Data Source",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "mysql",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": { "text": "otel_logs", "value": "otel_logs" },
+        "hide": 0,
+        "label": "Table",
+        "name": "table",
+        "options": [{ "selected": true, "text": "otel_logs", "value": "otel_logs" }],
+        "query": "otel_logs",
+        "type": "textbox"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "mysql", "uid": "${datasource}" },
+        "definition": "SELECT DISTINCT service_name FROM ${table} WHERE service_name != '' AND service_name IS NOT NULL AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) ORDER BY service_name",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Service",
+        "multi": false,
+        "name": "service_name",
+        "options": [],
+        "query": "SELECT DISTINCT service_name FROM ${table} WHERE service_name != '' AND service_name IS NOT NULL AND timestamp >= FROM_UNIXTIME($__from/1000) AND timestamp <= FROM_UNIXTIME($__to/1000) ORDER BY service_name",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "title": "Nginx Logs Dashboard",
+  "uid": "nginx-logs-v4",
+  "version": 1
+}
