@@ -467,7 +467,7 @@
         {
           "datasource": { "type": "mysql", "uid": "${DS_DORIS}" },
           "format": "time_series",
-          "rawSql": "SELECT \n  timestamp as time,\n  CASE metric_name\n    WHEN 'node_filefd_allocated' THEN 'Allocated'\n    WHEN 'node_filefd_maximum' THEN 'Maximum'\n  END as metric,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name IN ('node_filefd_allocated', 'node_filefd_maximum')\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
+          "rawSql": "SELECT \n  timestamp as time,\n  'Allocated' as metric,\n  value\nFROM otel.otel_metrics_gauge\nWHERE metric_name = 'node_filefd_allocated'\n  AND service_name = '$service_name'\n  AND service_instance_id = '$instance'\n  AND $__timeFilter(timestamp)\nORDER BY time",
           "refId": "A"
         }
       ]
