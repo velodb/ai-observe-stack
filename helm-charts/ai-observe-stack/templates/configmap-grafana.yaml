@@ -7,9 +7,9 @@ Grafana Provisioning ConfigMaps
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "oos.grafana.fullname" . }}-datasources
+  name: {{ include "aiobs.grafana.fullname" . }}-datasources
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
     grafana_datasource: "1"
 data:
@@ -23,9 +23,9 @@ data:
       - name: Doris
         type: mysql
         uid: doris
-        url: {{ include "oos.doris.mysqlEndpoint" . }}
-        user: {{ include "oos.doris.user" . }}
-        database: {{ include "oos.doris.database" . }}
+        url: {{ include "aiobs.doris.mysqlEndpoint" . }}
+        user: {{ include "aiobs.doris.user" . }}
+        database: {{ include "aiobs.doris.database" . }}
         isDefault: true
         jsonData:
           maxOpenConns: 10
@@ -33,7 +33,7 @@ data:
           connMaxLifetime: 14400
           tlsSkipVerify: true
         secureJsonData:
-          password: "{{ include "oos.doris.password" . }}"
+          password: "{{ include "aiobs.doris.password" . }}"
         editable: true
 
 ---
@@ -41,9 +41,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "oos.grafana.fullname" . }}-dashboard-providers
+  name: {{ include "aiobs.grafana.fullname" . }}-dashboard-providers
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
 data:
   dashboards.yaml: |
@@ -51,14 +51,14 @@ data:
     apiVersion: 1
 
     providers:
-      - name: 'Open Observability Stack Dashboards'
+      - name: 'AIObserve Stack Dashboards'
         orgId: 1
-        folder: 'Open Observability Stack'
-        folderUid: oos-observability
+        folder: 'AIObserve Stack'
+        folderUid: aiobs-observability
         type: file
         disableDeletion: false
         updateIntervalSeconds: 30
         allowUiUpdates: true
         options:
-          path: /var/lib/grafana/dashboards/oos
+          path: /var/lib/grafana/dashboards/aiobs
 {{- end }}

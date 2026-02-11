@@ -1,4 +1,4 @@
-🔭 Open Observability Stack
+🔭 AIObserve Stack
 
 Thank you for installing {{ .Chart.Name }}!
 
@@ -7,8 +7,8 @@ DEPLOYMENT SUMMARY
 =============================================================================
 
 {{- if eq .Values.doris.mode "internal" }}
-📦 Doris Mode: INTERNAL (managed by Open Observability Stack)
-   - DorisCluster: {{ include "oos.doris.clusterName" . }}
+📦 Doris Mode: INTERNAL (managed by AIObserve Stack)
+   - DorisCluster: {{ include "aiobs.doris.clusterName" . }}
    - FE Replicas: {{ .Values.doris.internal.cluster.fe.replicas }}
    - BE Replicas: {{ .Values.doris.internal.cluster.be.replicas }}
 {{- else }}
@@ -28,7 +28,7 @@ DEPLOYMENT SUMMARY
 
 {{- if .Values.grafana.enabled }}
 📊 Grafana: ENABLED
-   - Service: {{ include "oos.grafana.fullname" . }}
+   - Service: {{ include "aiobs.grafana.fullname" . }}
    - Port: {{ .Values.grafana.service.port }}
 {{- else }}
 📊 Grafana: DISABLED
@@ -42,7 +42,7 @@ ACCESS INSTRUCTIONS
 1. Access Grafana:
 
    # Port forward to Grafana
-   kubectl port-forward svc/{{ include "oos.grafana.fullname" . }} 3000:{{ .Values.grafana.service.port }} -n {{ .Release.Namespace }}
+   kubectl port-forward svc/{{ include "aiobs.grafana.fullname" . }} 3000:{{ .Values.grafana.service.port }} -n {{ .Release.Namespace }}
 
    # Open in browser
    http://localhost:3000
@@ -57,11 +57,11 @@ ACCESS INSTRUCTIONS
 2. Send telemetry data to OTel Collector:
 
    # From within the cluster
-   OTLP gRPC: {{ include "oos.otel.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.otel.ports.otlpGrpc }}
-   OTLP HTTP: {{ include "oos.otel.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.otel.ports.otlpHttp }}
+   OTLP gRPC: {{ include "aiobs.otel.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.otel.ports.otlpGrpc }}
+   OTLP HTTP: {{ include "aiobs.otel.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.otel.ports.otlpHttp }}
 
    # Port forward for local testing
-   kubectl port-forward svc/{{ include "oos.otel.fullname" . }} 4317:{{ .Values.otel.ports.otlpGrpc }} 4318:{{ .Values.otel.ports.otlpHttp }} -n {{ .Release.Namespace }}
+   kubectl port-forward svc/{{ include "aiobs.otel.fullname" . }} 4317:{{ .Values.otel.ports.otlpGrpc }} 4318:{{ .Values.otel.ports.otlpHttp }} -n {{ .Release.Namespace }}
 {{- end }}
 
 {{- if eq .Values.doris.mode "internal" }}
@@ -69,13 +69,13 @@ ACCESS INSTRUCTIONS
 3. Access Doris:
 
    # Port forward to Doris FE (MySQL protocol)
-   kubectl port-forward svc/{{ include "oos.doris.clusterName" . }}-fe 9030:9030 -n {{ .Release.Namespace }}
+   kubectl port-forward svc/{{ include "aiobs.doris.clusterName" . }}-fe 9030:9030 -n {{ .Release.Namespace }}
 
    # Connect via MySQL client
    mysql -h 127.0.0.1 -P 9030 -u root
 
    # Port forward to Doris FE Web UI
-   kubectl port-forward svc/{{ include "oos.doris.clusterName" . }}-fe 8030:8030 -n {{ .Release.Namespace }}
+   kubectl port-forward svc/{{ include "aiobs.doris.clusterName" . }}-fe 8030:8030 -n {{ .Release.Namespace }}
    # Open http://localhost:8030
 {{- end }}
 
@@ -99,7 +99,7 @@ DOCUMENTATION
 =============================================================================
 
 For more information, visit:
-- Open Observability Stack: https://github.com/velodb/open-observability-stack
+- AIObserve Stack: https://github.com/velodb/ai-observe-stack
 - Apache Doris: https://doris.apache.org
 - OpenTelemetry: https://opentelemetry.io
 - Grafana: https://grafana.com

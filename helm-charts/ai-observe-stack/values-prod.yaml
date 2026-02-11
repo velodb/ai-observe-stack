@@ -1,5 +1,5 @@
 # =============================================================================
-# Open Observability Stack - Production Environment Values
+# AIObserve Stack - Production Environment Values
 # =============================================================================
 # High availability configuration for production deployments
 
@@ -101,12 +101,12 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: oos.example.com
+    - host: aiobs.example.com
       paths:
         - path: /
           pathType: Prefix
           service: grafana
   tls:
-    - secretName: oos-tls
+    - secretName: aiobs-tls
       hosts:
-        - oos.example.com
+        - aiobs.example.com

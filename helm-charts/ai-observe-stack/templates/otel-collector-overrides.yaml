@@ -7,9 +7,9 @@ OpenTelemetry Collector Gateway - StatefulSet for HA with log persistence
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "oos.otel.fullname" . }}-headless
+  name: {{ include "aiobs.otel.fullname" . }}-headless
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: otel-collector
 spec:
   type: ClusterIP
@@ -32,7 +32,7 @@ spec:
       targetPort: {{ .Values.otel.ports.healthCheck }}
       protocol: TCP
   selector:
-    app.kubernetes.io/name: {{ include "oos.name" . }}-otel-collector
+    app.kubernetes.io/name: {{ include "aiobs.name" . }}-otel-collector
     app.kubernetes.io/instance: {{ .Release.Name }}
 
 ---
@@ -40,9 +40,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "oos.otel.fullname" . }}
+  name: {{ include "aiobs.otel.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: otel-collector
 spec:
   type: ClusterIP
@@ -64,7 +64,7 @@ spec:
       targetPort: {{ .Values.otel.ports.healthCheck }}
       protocol: TCP
   selector:
-    app.kubernetes.io/name: {{ include "oos.name" . }}-otel-collector
+    app.kubernetes.io/name: {{ include "aiobs.name" . }}-otel-collector
     app.kubernetes.io/instance: {{ .Release.Name }}
 
 ---
@@ -72,22 +72,22 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "oos.otel.fullname" . }}
+  name: {{ include "aiobs.otel.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: otel-collector
 spec:
-  serviceName: {{ include "oos.otel.fullname" . }}-headless
+  serviceName: {{ include "aiobs.otel.fullname" . }}-headless
   replicas: {{ .Values.otel.replicas }}
   podManagementPolicy: {{ .Values.otel.podManagementPolicy | default "Parallel" }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "oos.name" . }}-otel-collector
+      app.kubernetes.io/name: {{ include "aiobs.name" . }}-otel-collector
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "oos.name" . }}-otel-collector
+        app.kubernetes.io/name: {{ include "aiobs.name" . }}-otel-collector
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap-otel.yaml") . | sha256sum }}
@@ -102,13 +102,13 @@ spec:
             - -c
             - |
               echo "Waiting for Doris FE MySQL port (9030) to be ready..."
-              until nc -z {{ include "oos.doris.clusterName" . }}-fe-service 9030; do
+              until nc -z {{ include "aiobs.doris.clusterName" . }}-fe-service 9030; do
                 echo "Doris FE MySQL port not ready, waiting..."
                 sleep 5
               done
               echo "Doris FE MySQL port is ready!"
               echo "Waiting for Doris FE HTTP port (8030) to be ready..."
-              until nc -z {{ include "oos.doris.clusterName" . }}-fe-service 8030; do
+              until nc -z {{ include "aiobs.doris.clusterName" . }}-fe-service 8030; do
                 echo "Doris FE HTTP port not ready, waiting..."
                 sleep 5
               done
@@ -169,14 +169,14 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "oos.otel.fullname" . }}-config
+            name: {{ include "aiobs.otel.fullname" . }}-config
   {{- if .Values.otel.persistence.enabled }}
   # VolumeClaimTemplates for persistent log storage
   volumeClaimTemplates:
     - metadata:
         name: logs
         labels:
-          {{- include "oos.labels" . | nindent 10 }}
+          {{- include "aiobs.labels" . | nindent 10 }}
           app.kubernetes.io/component: otel-collector
       spec:
         accessModes:

@@ -1,6 +1,6 @@
 # Deployment
 
-This guide covers three ways to deploy Open Observability Stack. Choose the method that fits your environment:
+This guide covers three ways to deploy AIObserve Stack. Choose the method that fits your environment:
 
 | Method | Best for |
 |--------|----------|
@@ -24,8 +24,8 @@ Best for local testing, development, and proof of concepts (PoC).
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/velodb/open-observability-stack.git
-   cd open-observability-stack/docker
+   git clone https://github.com/velodb/ai-observe-stack.git
+   cd ai-observe-stack/docker
    ```
 
 2. If you already have an existing Apache Doris cluster, configure the connection and start in external mode:
@@ -104,29 +104,29 @@ Best for production deployments, development environments, and scalable setups.
 
 ## Deploy
 
-1. Add the Open Observability Stack Helm repository:
+1. Add the AIObserve Stack Helm repository:
 
    ```bash
-   helm repo add open-observability-stack https://charts.velodb.io
+   helm repo add ai-observe-stack https://charts.velodb.io
    helm repo update
    ```
 
-2. Create a namespace for Open Observability Stack:
+2. Create a namespace for AIObserve Stack:
 
    ```bash
-   kubectl create namespace open-observability-stack
+   kubectl create namespace ai-observe-stack
    ```
 
-3. Install Open Observability Stack:
+3. Install AIObserve Stack:
 
    ```bash
-   helm install my-oos open-observability-stack/open-observability-stack -n open-observability-stack
+   helm install my-aiobs ai-observe-stack/ai-observe-stack -n ai-observe-stack
    ```
 
    If you have an existing Doris cluster, use external mode instead:
 
    ```bash
-   helm install my-oos open-observability-stack/open-observability-stack -n open-observability-stack \
+   helm install my-aiobs ai-observe-stack/ai-observe-stack -n ai-observe-stack \
      --set doris.mode=external \
      --set doris.external.host=<DORIS_FE_HOST> \
      --set doris.external.port=9030 \
@@ -137,7 +137,7 @@ Best for production deployments, development environments, and scalable setups.
 4. Verify all pods are running:
 
    ```bash
-   kubectl get pods -n open-observability-stack
+   kubectl get pods -n ai-observe-stack
    ```
 
    Wait until all pods show `Running` status.
@@ -145,7 +145,7 @@ Best for production deployments, development environments, and scalable setups.
 5. Access Grafana:
 
    ```bash
-   kubectl port-forward svc/my-oos-grafana 3000:3000 -n open-observability-stack
+   kubectl port-forward svc/my-aiobs-grafana 3000:3000 -n ai-observe-stack
    ```
 
    Open http://localhost:3000 and log in with `admin` / `admin`.
@@ -154,15 +154,15 @@ Best for production deployments, development environments, and scalable setups.
 
 | Service | Port-forward command |
 |---------|---------------------|
-| Grafana | `kubectl port-forward svc/my-oos-grafana 3000:3000 -n open-observability-stack` |
-| Doris FE UI | `kubectl port-forward svc/my-oos-doris-fe 8030:8030 -n open-observability-stack` |
-| Doris MySQL | `kubectl port-forward svc/my-oos-doris-fe 9030:9030 -n open-observability-stack` |
+| Grafana | `kubectl port-forward svc/my-aiobs-grafana 3000:3000 -n ai-observe-stack` |
+| Doris FE UI | `kubectl port-forward svc/my-aiobs-doris-fe 8030:8030 -n ai-observe-stack` |
+| Doris MySQL | `kubectl port-forward svc/my-aiobs-doris-fe 9030:9030 -n ai-observe-stack` |
 
 ## Uninstall
 
 ```bash
-helm uninstall my-oos -n open-observability-stack
-kubectl delete namespace open-observability-stack
+helm uninstall my-aiobs -n ai-observe-stack
+kubectl delete namespace ai-observe-stack
 ```
 
 # Manually
@@ -176,7 +176,7 @@ Best for custom setups or integrating with existing infrastructure.
 
 3. Deploy Grafana following the [Grafana installation documentation](https://grafana.com/docs/grafana/latest/setup-grafana/installation/).
 
-4. Install the Open Observability Stack Grafana plugin. See [Plugin Installation](docs/plugin-installation.md).
+4. Install the AIObserve Stack Grafana plugin. See [Plugin Installation](docs/plugin-installation.md).
 
 After completing all steps, access Grafana at http://localhost:3000.
 

@@ -5,11 +5,11 @@ DorisCluster CR - Only created when using internal Doris mode
 apiVersion: doris.selectdb.com/v1
 kind: DorisCluster
 metadata:
-  name: {{ include "oos.doris.clusterName" . }}
+  name: {{ include "aiobs.doris.clusterName" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/name: doriscluster
-    app.kubernetes.io/instance: {{ include "oos.doris.clusterName" . }}
+    app.kubernetes.io/instance: {{ include "aiobs.doris.clusterName" . }}
     app.kubernetes.io/part-of: doris-operator
 spec:
   # Frontend (FE) Specification

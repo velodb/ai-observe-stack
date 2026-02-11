@@ -8,20 +8,20 @@ This file configures Grafana to use our custom datasources and dashboard provide
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "oos.grafana.fullname" . }}
+  name: {{ include "aiobs.grafana.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "oos.name" . }}-grafana
+      app.kubernetes.io/name: {{ include "aiobs.name" . }}-grafana
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "oos.name" . }}-grafana
+        app.kubernetes.io/name: {{ include "aiobs.name" . }}-grafana
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         checksum/datasources: {{ include (print $.Template.BasePath "/configmap-grafana.yaml") . | sha256sum }}
@@ -42,7 +42,7 @@ spec:
             - -c
             - |
               mkdir -p /var/lib/grafana/plugins
-              mkdir -p /var/lib/grafana/dashboards/oos
+              mkdir -p /var/lib/grafana/dashboards/aiobs
               chown -R 472:472 /var/lib/grafana
               chmod -R 755 /var/lib/grafana
               echo "Grafana data directory initialized."
@@ -63,12 +63,12 @@ spec:
               echo "Copying doris-app plugin..."
               cp -r /assets/plugins/* /var/lib/grafana/plugins/
               echo "Copying dashboards..."
-              cp -r /assets/dashboards/* /var/lib/grafana/dashboards/oos/
+              cp -r /assets/dashboards/* /var/lib/grafana/dashboards/aiobs/
               chown -R 472:472 /var/lib/grafana/plugins /var/lib/grafana/dashboards
               chmod -R 755 /var/lib/grafana/plugins /var/lib/grafana/dashboards
               echo "Assets installed successfully."
               ls -la /var/lib/grafana/plugins/
-              ls -la /var/lib/grafana/dashboards/oos/
+              ls -la /var/lib/grafana/dashboards/aiobs/
           volumeMounts:
             - name: storage
               mountPath: /var/lib/grafana
@@ -82,7 +82,7 @@ spec:
             - -c
             - |
               echo "Waiting for Doris FE to be ready..."
-              until nc -z {{ include "oos.doris.clusterName" . }}-fe-service 9030; do
+              until nc -z {{ include "aiobs.doris.clusterName" . }}-fe-service 9030; do
                 echo "Doris FE not ready, waiting..."
                 sleep 5
               done
@@ -148,25 +148,25 @@ spec:
         - name: storage
           {{- if .Values.grafana.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "oos.grafana.fullname" . }}
+            claimName: {{ include "aiobs.grafana.fullname" . }}
           {{- else }}
           emptyDir: {}
           {{- end }}
         - name: datasources
           configMap:
-            name: {{ include "oos.grafana.fullname" . }}-datasources
+            name: {{ include "aiobs.grafana.fullname" . }}-datasources
         - name: dashboard-providers
           configMap:
-            name: {{ include "oos.grafana.fullname" . }}-dashboard-providers
+            name: {{ include "aiobs.grafana.fullname" . }}-dashboard-providers
 
 ---
 # Grafana Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "oos.grafana.fullname" . }}
+  name: {{ include "aiobs.grafana.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
 spec:
   type: {{ .Values.grafana.service.type }}
@@ -176,7 +176,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    app.kubernetes.io/name: {{ include "oos.name" . }}-grafana
+    app.kubernetes.io/name: {{ include "aiobs.name" . }}-grafana
     app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- if .Values.grafana.persistence.enabled }}
@@ -185,9 +185,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "oos.grafana.fullname" . }}
+  name: {{ include "aiobs.grafana.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
     app.kubernetes.io/component: grafana
 spec:
   accessModes:

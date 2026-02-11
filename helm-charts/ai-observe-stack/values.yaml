@@ -1,7 +1,7 @@
 # =============================================================================
-# Open Observability Stack
+# AIObserve Stack
 # =============================================================================
-# Default values for Open Observability Stack helm chart.
+# Default values for AIObserve Stack helm chart.
 
 # -----------------------------------------------------------------------------
 # Global settings
@@ -11,7 +11,7 @@ global:
   fullnameOverride: ""
 
 # -----------------------------------------------------------------------------
-# Open Observability Stack settings
+# AIObserve Stack settings
 # -----------------------------------------------------------------------------
 openObservabilityStack:
   # Timezone for the entire stack (Doris + OTel Collector)
@@ -251,7 +251,7 @@ ingress:
   className: ""
   annotations: {}
   hosts:
-    - host: oos.local
+    - host: aiobs.local
       paths:
         - path: /
           pathType: Prefix

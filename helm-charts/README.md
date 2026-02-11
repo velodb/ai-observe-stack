@@ -1,8 +1,8 @@
-# Open Observability Stack Helm Chart
+# AIObserve Stack Helm Chart
 
 [中文文档](./README_zh.md)
 
-**Open Observability Stack** is a complete observability stack using Apache Doris as the storage backend for traces, metrics, and logs, with OpenTelemetry and Grafana.
+**AIObserve Stack** is a complete observability stack using Apache Doris as the storage backend for traces, metrics, and logs, with OpenTelemetry and Grafana.
 
 By default, the Helm chart provisions all core components, including:
 
@@ -41,28 +41,28 @@ The chart supports standard Kubernetes best practices, including:
 ### 1. Add Helm Repository
 
 ```bash
-helm repo add open-observability-stack https://charts.velodb.io
+helm repo add ai-observe-stack https://charts.velodb.io
 helm repo update
 ```
 
 ### 2. Create Namespace
 
 ```bash
-kubectl create namespace open-observability-stack
+kubectl create namespace ai-observe-stack
 ```
 
-### 3. Install Open Observability Stack
+### 3. Install AIObserve Stack
 
 Install with default values (internal Doris):
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack
 ```
 
 If you have an existing Doris cluster, use external mode:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set doris.mode=external \
   --set doris.external.host=<DORIS_FE_HOST> \
   --set doris.external.port=9030 \
@@ -77,37 +77,37 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 Check that all pods are running:
 
 ```bash
-kubectl get pods -n open-observability-stack
+kubectl get pods -n ai-observe-stack
 ```
 
 Expected output (pod name prefix depends on release name):
 
 ```
 NAME                                READY   STATUS    RESTARTS   AGE
-open-observability-stack-doris-fe-0                 1/1     Running   0          2m
-open-observability-stack-doris-be-0                 1/1     Running   0          1m
-open-observability-stack-grafana-xxx                1/1     Running   0          2m
-open-observability-stack-otel-collector-0           1/1     Running   0          2m
-open-observability-stack-otel-collector-1           1/1     Running   0          2m
+ai-observe-stack-doris-fe-0                 1/1     Running   0          2m
+ai-observe-stack-doris-be-0                 1/1     Running   0          1m
+ai-observe-stack-grafana-xxx                1/1     Running   0          2m
+ai-observe-stack-otel-collector-0           1/1     Running   0          2m
+ai-observe-stack-otel-collector-1           1/1     Running   0          2m
 doris-operator-xxx                  1/1     Running   0          2m
 ```
 
 Check DorisCluster status:
 
 ```bash
-kubectl get doriscluster -n open-observability-stack
+kubectl get doriscluster -n ai-observe-stack
 ```
 
 ---
 
 ## Forward Ports
 
-Port forwarding allows you to access and set up Open Observability Stack. For production deployments, configure ingress instead.
+Port forwarding allows you to access and set up AIObserve Stack. For production deployments, configure ingress instead.
 
 ### Access Grafana
 
 ```bash
-kubectl port-forward svc/open-observability-stack-grafana 3000:3000 -n open-observability-stack --address 0.0.0.0
+kubectl port-forward svc/ai-observe-stack-grafana 3000:3000 -n ai-observe-stack --address 0.0.0.0
 ```
 
 Visit http://localhost:3000 (or http://YOUR_SERVER_IP:3000)
@@ -119,7 +119,7 @@ Visit http://localhost:3000 (or http://YOUR_SERVER_IP:3000)
 ### Access OTel Collector
 
 ```bash
-kubectl port-forward svc/open-observability-stack-otel-collector 4317:4317 4318:4318 -n open-observability-stack --address 0.0.0.0
+kubectl port-forward svc/ai-observe-stack-otel-collector 4317:4317 4318:4318 -n ai-observe-stack --address 0.0.0.0
 ```
 
 Send telemetry data to:
@@ -130,13 +130,13 @@ Send telemetry data to:
 
 ```bash
 # MySQL protocol
-kubectl port-forward svc/open-observability-stack-doris-fe-service 9030:9030 -n open-observability-stack
+kubectl port-forward svc/ai-observe-stack-doris-fe-service 9030:9030 -n ai-observe-stack
 
 # Connect via MySQL client
 mysql -h 127.0.0.1 -P 9030 -u root
 
 # Web UI
-kubectl port-forward svc/open-observability-stack-doris-fe-service 8030:8030 -n open-observability-stack
+kubectl port-forward svc/ai-observe-stack-doris-fe-service 8030:8030 -n ai-observe-stack
 ```
 
 ---
@@ -146,7 +146,7 @@ kubectl port-forward svc/open-observability-stack-doris-fe-service 8030:8030 -n 
 You can customize settings by using `--set` flags:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set grafana.adminPassword=mysecretpassword
 ```
 
@@ -154,10 +154,10 @@ Or create a custom `values.yaml`:
 
 ```bash
 # Get default values
-helm show values open-observability-stack/open-observability-stack > my-values.yaml
+helm show values ai-observe-stack/ai-observe-stack > my-values.yaml
 
 # Edit and install
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f my-values.yaml
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f my-values.yaml
 ```
 
 ### Key Configuration Options
@@ -176,14 +176,14 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 | `dorisPlugin.enabled` | Enable Doris App Plugin | `true` |
 | `ingress.enabled` | Enable Ingress | `false` |
 
-See [values.yaml](./open-observability-stack/values.yaml) for the complete list.
+See [values.yaml](./ai-observe-stack/values.yaml) for the complete list.
 
 ### Timezone Configuration
 
 By default, all components use **UTC** timezone. To use a different timezone (e.g., `Asia/Shanghai`), set `openObservabilityStack.timezone`:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set openObservabilityStack.timezone=Asia/Shanghai
 ```
 
@@ -210,7 +210,7 @@ For handling sensitive data such as database credentials, use Kubernetes secrets
 kubectl create secret generic doris-credentials \
   --from-literal=username=root \
   --from-literal=password=mysecretpassword \
-  -n open-observability-stack
+  -n ai-observe-stack
 ```
 
 ### Reference in values.yaml
@@ -232,7 +232,7 @@ doris:
 If using an existing Doris cluster, disable the internal Doris and specify the external connection:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set doris.mode=external \
   --set doris.external.host=172.19.0.12 \
   --set doris.external.port=9030 \
@@ -262,7 +262,7 @@ doris:
 ```
 
 ```bash
-helm install open-observability-stack . -n open-observability-stack -f values-external-doris.yaml
+helm install ai-observe-stack . -n ai-observe-stack -f values-external-doris.yaml
 ```
 
 > **Note:** When using external Doris, `feHttpPort` is used for Stream Load operations (default 8030). If your Doris FE uses a different HTTP port, make sure to set it correctly.
@@ -276,7 +276,7 @@ helm install open-observability-stack . -n open-observability-stack -f values-ex
 Minimal resources for local development:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f values-dev.yaml
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f values-dev.yaml
 ```
 
 Features:
@@ -290,7 +290,7 @@ Features:
 High availability configuration:
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f values-prod.yaml \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f values-prod.yaml \
   --set grafana.adminPassword="CHANGE_ME_IN_PRODUCTION"
 ```
 
@@ -339,15 +339,15 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: oos.example.com
+    - host: aiobs.example.com
       paths:
         - path: /
           pathType: Prefix
           service: grafana
   tls:
-    - secretName: oos-tls
+    - secretName: aiobs-tls
       hosts:
-        - oos.example.com
+        - aiobs.example.com
 ```
 
 ### Persistence
@@ -384,41 +384,41 @@ grafana:
 To upgrade to a newer version:
 
 ```bash
-helm upgrade open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f your-values.yaml
+helm upgrade ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f your-values.yaml
 ```
 
 To check current release:
 
 ```bash
-helm list -n open-observability-stack
+helm list -n ai-observe-stack
 ```
 
 ---
 
-## Uninstalling Open Observability Stack
+## Uninstalling AIObserve Stack
 
 To remove the deployment:
 
 ```bash
-helm uninstall open-observability-stack -n open-observability-stack
+helm uninstall ai-observe-stack -n ai-observe-stack
 ```
 
 If using internal Doris, the DorisCluster CR may need manual deletion:
 
 ```bash
-kubectl delete doriscluster -n open-observability-stack --all
+kubectl delete doriscluster -n ai-observe-stack --all
 ```
 
 Delete PVCs if you want to remove all data:
 
 ```bash
-kubectl delete pvc -n open-observability-stack --all
+kubectl delete pvc -n ai-observe-stack --all
 ```
 
 Delete namespace (optional):
 
 ```bash
-kubectl delete namespace open-observability-stack
+kubectl delete namespace ai-observe-stack
 ```
 
 ---
@@ -429,39 +429,39 @@ kubectl delete namespace open-observability-stack
 
 ```bash
 # OTel Collector logs
-kubectl logs -l app.kubernetes.io/name=open-observability-stack-otel-collector -n open-observability-stack
+kubectl logs -l app.kubernetes.io/name=ai-observe-stack-otel-collector -n ai-observe-stack
 
 # Grafana logs
-kubectl logs -l app.kubernetes.io/name=open-observability-stack-grafana -n open-observability-stack
+kubectl logs -l app.kubernetes.io/name=ai-observe-stack-grafana -n ai-observe-stack
 
 # Doris FE logs
-kubectl logs -l app.kubernetes.io/component=fe -n open-observability-stack
+kubectl logs -l app.kubernetes.io/component=fe -n ai-observe-stack
 
 # Doris BE logs
-kubectl logs -l app.kubernetes.io/component=be -n open-observability-stack
+kubectl logs -l app.kubernetes.io/component=be -n ai-observe-stack
 ```
 
 ### Debugging a Failed Install
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack --debug --dry-run
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack --debug --dry-run
 ```
 
 ### Verifying Deployment
 
 ```bash
-kubectl get pods -n open-observability-stack
-kubectl get svc -n open-observability-stack
-kubectl get doriscluster -n open-observability-stack
+kubectl get pods -n ai-observe-stack
+kubectl get svc -n ai-observe-stack
+kubectl get doriscluster -n ai-observe-stack
 ```
 
 ### Common Issues
 
 | Issue | Solution |
 |-------|----------|
-| OTel Collector CrashLoopBackOff | Check Doris connectivity: `kubectl logs open-observability-stack-otel-collector-0 -n open-observability-stack` |
-| Grafana plugin not loading | Verify plugin image is loaded: `kubectl describe pod -l app.kubernetes.io/name=open-observability-stack-grafana -n open-observability-stack` |
-| Doris FE not ready | Check Doris Operator logs: `kubectl logs -l app.kubernetes.io/name=doris-operator -n open-observability-stack` |
+| OTel Collector CrashLoopBackOff | Check Doris connectivity: `kubectl logs ai-observe-stack-otel-collector-0 -n ai-observe-stack` |
+| Grafana plugin not loading | Verify plugin image is loaded: `kubectl describe pod -l app.kubernetes.io/name=ai-observe-stack-grafana -n ai-observe-stack` |
+| Doris FE not ready | Check Doris Operator logs: `kubectl logs -l app.kubernetes.io/name=doris-operator -n ai-observe-stack` |
 
 ---
 
@@ -481,7 +481,7 @@ kubectl get doriscluster -n open-observability-stack
 │                                  ▼                                       │
 │              ┌───────────────────────────────────┐                       │
 │              │   OpenTelemetry Collector         │                       │
-│              │   (open-observability-stack-otel-collector)       │                       │
+│              │   (ai-observe-stack-otel-collector)       │                       │
 │              └───────────────────┬───────────────┘                       │
 │                                  │ Doris Exporter (Stream Load)         │
 │                                  ▼                                       │
@@ -490,13 +490,13 @@ kubectl get doriscluster -n open-observability-stack
 │              │   ┌─────────┐    ┌─────────┐      │                       │
 │              │   │   FE    │    │   BE    │      │                       │
 │              │   └─────────┘    └─────────┘      │                       │
-│              │   (open-observability-stack-doris)                │                       │
+│              │   (ai-observe-stack-doris)                │                       │
 │              └───────────────────┬───────────────┘                       │
 │                                  │ MySQL Protocol (9030)                │
 │                                  ▼                                       │
 │              ┌───────────────────────────────────┐                       │
 │              │   Grafana                         │                       │
-│              │   (open-observability-stack-grafana)              │                       │
+│              │   (ai-observe-stack-grafana)              │                       │
 │              │   + Doris App Plugin              │                       │
 │              │   + Dashboards                    │                       │
 │              └───────────────────────────────────┘                       │
@@ -514,11 +514,11 @@ After installation, the following services are available:
 
 | Service | Port | Description |
 |---------|------|-------------|
-| `open-observability-stack-otel-collector` | 4317 | OTLP gRPC receiver |
-| `open-observability-stack-otel-collector` | 4318 | OTLP HTTP receiver |
-| `open-observability-stack-otel-collector` | 8888 | Prometheus metrics |
-| `open-observability-stack-grafana` | 3000 | Grafana Web UI |
-| `open-observability-stack-doris-fe-service` | 9030 | Doris MySQL protocol |
-| `open-observability-stack-doris-fe-service` | 8030 | Doris FE HTTP (Stream Load) |
-| `open-observability-stack-doris-be-service` | 8040 | Doris BE HTTP |
+| `ai-observe-stack-otel-collector` | 4317 | OTLP gRPC receiver |
+| `ai-observe-stack-otel-collector` | 4318 | OTLP HTTP receiver |
+| `ai-observe-stack-otel-collector` | 8888 | Prometheus metrics |
+| `ai-observe-stack-grafana` | 3000 | Grafana Web UI |
+| `ai-observe-stack-doris-fe-service` | 9030 | Doris MySQL protocol |
+| `ai-observe-stack-doris-fe-service` | 8030 | Doris FE HTTP (Stream Load) |
+| `ai-observe-stack-doris-be-service` | 8040 | Doris BE HTTP |
 

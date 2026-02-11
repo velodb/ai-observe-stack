@@ -1,5 +1,5 @@
 # =============================================================================
-# Docker Compose - Open Observability Stack (Without Doris)
+# Docker Compose - AIObserve Stack (Without Doris)
 # =============================================================================
 # This compose file connects to an EXTERNAL Apache Doris instance.
 # Users should configure their Doris connection via the .env file.
@@ -41,7 +41,7 @@ services:
       - DORIS_TABLE_METRICS=${DORIS_TABLE_METRICS:-otel_metrics}
     restart: unless-stopped
     networks:
-      - oos-net
+      - aiobs-net
 
   # =============================================================================
   # Grafana - Visualization with Doris Datasource
@@ -78,7 +78,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - oos-net
+      - aiobs-net
 
 # =============================================================================
 # Volumes
@@ -91,5 +91,5 @@ volumes:
 # Networks
 # =============================================================================
 networks:
-  oos-net:
+  aiobs-net:
     driver: bridge

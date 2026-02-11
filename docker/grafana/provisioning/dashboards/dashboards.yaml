@@ -3,10 +3,10 @@
 apiVersion: 1
 
 providers:
-  - name: 'Open Observability Stack Dashboards'
+  - name: 'AIObserve Stack Dashboards'
     orgId: 1
-    folder: 'Open Observability Stack'
-    folderUid: oos-observability
+    folder: 'AIObserve Stack'
+    folderUid: aiobs-observability
     type: file
     disableDeletion: false
     updateIntervalSeconds: 30

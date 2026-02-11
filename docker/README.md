@@ -1,6 +1,6 @@
-# Open Observability Stack - Docker Compose
+# AIObserve Stack - Docker Compose
 
-Open Observability Stack (Doris + OTel + Grafana) 是一个完整的可观测性解决方案，所有组件都以独立的 Docker 镜像分发：
+AIObserve Stack (Doris + OTel + Grafana) 是一个完整的可观测性解决方案，所有组件都以独立的 Docker 镜像分发：
 
 - **Apache Doris** - 高性能实时分析数据库
 - **OpenTelemetry Collector** - 遥测数据采集网关
@@ -73,8 +73,8 @@ Docker Compose 基于默认 OTel Collector 配置暴露以下端口：
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/velodb/open-observability-stack.git
-cd open-observability-stack/docker
+git clone https://github.com/velodb/ai-observe-stack.git
+cd ai-observe-stack/docker
 ```
 
 ### 2. 启动服务
@@ -217,7 +217,7 @@ receivers:
 
 ## 数据 Schema
 
-Open Observability Stack 在 Doris 中自动创建三张主要表：
+AIObserve Stack 在 Doris 中自动创建三张主要表：
 
 | 表名 | 用途 |
 |------|------|
@@ -240,7 +240,7 @@ otel-cli exec \
   --endpoint localhost:4317 \
   --service my-service \
   --name "test-span" \
-  -- echo "Hello Open Observability Stack!"
+  -- echo "Hello AIObserve Stack!"
 ```
 
 ### 使用 curl (OTLP/HTTP)
@@ -258,7 +258,7 @@ curl -X POST http://localhost:4318/v1/logs \
         "logRecords": [{
           "timeUnixNano": "'$(date +%s)000000000'",
           "severityText": "INFO",
-          "body": {"stringValue": "Test log message from Open Observability Stack"}
+          "body": {"stringValue": "Test log message from AIObserve Stack"}
         }]
       }]
     }]

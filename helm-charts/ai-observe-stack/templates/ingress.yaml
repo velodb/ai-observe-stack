@@ -1,13 +1,13 @@
 {{/*
-Ingress for Open Observability Stack services
+Ingress for AIObserve Stack services
 */}}
 {{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "oos.fullname" . }}
+  name: {{ include "aiobs.fullname" . }}
   labels:
-    {{- include "oos.labels" . | nindent 4 }}
+    {{- include "aiobs.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -37,11 +37,11 @@ spec:
             backend:
               service:
                 {{- if eq .service "grafana" }}
-                name: {{ include "oos.grafana.fullname" $ }}
+                name: {{ include "aiobs.grafana.fullname" $ }}
                 port:
                   number: {{ $.Values.grafana.service.port }}
                 {{- else if eq .service "otel" }}
-                name: {{ include "oos.otel.fullname" $ }}
+                name: {{ include "aiobs.otel.fullname" $ }}
                 port:
                   number: {{ $.Values.otel.ports.otlpHttp }}
                 {{- end }}

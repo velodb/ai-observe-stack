@@ -1,13 +1,13 @@
 apiVersion: v2
-name: open-observability-stack
-description: Open Observability Stack - A complete observability stack using Apache Doris as the storage backend for traces, metrics, and logs, with OpenTelemetry and Grafana.
+name: ai-observe-stack
+description: AIObserve Stack - A complete observability stack using Apache Doris as the storage backend for traces, metrics, and logs, with OpenTelemetry and Grafana.
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
 
 keywords:
   - observability
-  - open-observability-stack
+  - ai-observe-stack
   - doris
   - grafana
   - opentelemetry
@@ -16,7 +16,7 @@ keywords:
   - metrics
   - logs
 
-home: https://github.com/velodb/open-observability-stack.git
+home: https://github.com/velodb/ai-observe-stack.git
 icon: https://charts.velodb.io/images/doris.jpg
 
 maintainers:

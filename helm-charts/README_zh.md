@@ -1,8 +1,8 @@
-# Open Observability Stack Helm Chart
+# AIObserve Stack Helm Chart
 
 [English](./README.md)
 
-**Open Observability Stack** 是一个完整的可观测性技术栈，使用 Apache Doris 作为 Traces、Metrics 和 Logs 的存储后端，结合 OpenTelemetry 和 Grafana。
+**AIObserve Stack** 是一个完整的可观测性技术栈，使用 Apache Doris 作为 Traces、Metrics 和 Logs 的存储后端，结合 OpenTelemetry 和 Grafana。
 
 默认情况下，Helm Chart 会部署所有核心组件，包括：
 
@@ -41,28 +41,28 @@ Chart 支持 Kubernetes 标准最佳实践，包括：
 ### 1. 添加 Helm 仓库
 
 ```bash
-helm repo add open-observability-stack https://charts.velodb.io
+helm repo add ai-observe-stack https://charts.velodb.io
 helm repo update
 ```
 
 ### 2. 创建命名空间
 
 ```bash
-kubectl create namespace open-observability-stack
+kubectl create namespace ai-observe-stack
 ```
 
-### 3. 安装 Open Observability Stack
+### 3. 安装 AIObserve Stack
 
 使用默认配置安装（内部 Doris 模式）：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack
 ```
 
 如果已有 Doris 集群，使用外部模式：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set doris.mode=external \
   --set doris.external.host=<DORIS_FE_HOST> \
   --set doris.external.port=9030 \
@@ -77,37 +77,37 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 检查所有 Pod 是否正常运行：
 
 ```bash
-kubectl get pods -n open-observability-stack
+kubectl get pods -n ai-observe-stack
 ```
 
 预期输出（Pod 名称前缀取决于 release 名称）：
 
 ```
 NAME                                READY   STATUS    RESTARTS   AGE
-open-observability-stack-doris-fe-0                 1/1     Running   0          2m
-open-observability-stack-doris-be-0                 1/1     Running   0          1m
-open-observability-stack-grafana-xxx                1/1     Running   0          2m
-open-observability-stack-otel-collector-0           1/1     Running   0          2m
-open-observability-stack-otel-collector-1           1/1     Running   0          2m
+ai-observe-stack-doris-fe-0                 1/1     Running   0          2m
+ai-observe-stack-doris-be-0                 1/1     Running   0          1m
+ai-observe-stack-grafana-xxx                1/1     Running   0          2m
+ai-observe-stack-otel-collector-0           1/1     Running   0          2m
+ai-observe-stack-otel-collector-1           1/1     Running   0          2m
 doris-operator-xxx                  1/1     Running   0          2m
 ```
 
 检查 DorisCluster 状态：
 
 ```bash
-kubectl get doriscluster -n open-observability-stack
+kubectl get doriscluster -n ai-observe-stack
 ```
 
 ---
 
 ## 端口转发
 
-端口转发可以让你访问和配置 Open Observability Stack。生产环境建议配置 Ingress。
+端口转发可以让你访问和配置 AIObserve Stack。生产环境建议配置 Ingress。
 
 ### 访问 Grafana
 
 ```bash
-kubectl port-forward svc/open-observability-stack-grafana 3000:3000 -n open-observability-stack --address 0.0.0.0
+kubectl port-forward svc/ai-observe-stack-grafana 3000:3000 -n ai-observe-stack --address 0.0.0.0
 ```
 
 访问 http://localhost:3000（或 http://服务器IP:3000）
@@ -119,7 +119,7 @@ kubectl port-forward svc/open-observability-stack-grafana 3000:3000 -n open-obse
 ### 访问 OTel Collector
 
 ```bash
-kubectl port-forward svc/open-observability-stack-otel-collector 4317:4317 4318:4318 -n open-observability-stack --address 0.0.0.0
+kubectl port-forward svc/ai-observe-stack-otel-collector 4317:4317 4318:4318 -n ai-observe-stack --address 0.0.0.0
 ```
 
 发送遥测数据到：
@@ -130,13 +130,13 @@ kubectl port-forward svc/open-observability-stack-otel-collector 4317:4317 4318:
 
 ```bash
 # MySQL 协议
-kubectl port-forward svc/open-observability-stack-doris-fe-service 9030:9030 -n open-observability-stack
+kubectl port-forward svc/ai-observe-stack-doris-fe-service 9030:9030 -n ai-observe-stack
 
 # 通过 MySQL 客户端连接
 mysql -h 127.0.0.1 -P 9030 -u root
 
 # Web UI
-kubectl port-forward svc/open-observability-stack-doris-fe-service 8030:8030 -n open-observability-stack
+kubectl port-forward svc/ai-observe-stack-doris-fe-service 8030:8030 -n ai-observe-stack
 ```
 
 ---
@@ -146,7 +146,7 @@ kubectl port-forward svc/open-observability-stack-doris-fe-service 8030:8030 -n 
 可以使用 `--set` 参数自定义设置：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set grafana.adminPassword=mysecretpassword
 ```
 
@@ -154,10 +154,10 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 
 ```bash
 # 获取默认配置
-helm show values open-observability-stack/open-observability-stack > my-values.yaml
+helm show values ai-observe-stack/ai-observe-stack > my-values.yaml
 
 # 编辑后安装
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f my-values.yaml
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f my-values.yaml
 ```
 
 ### 主要配置参数
@@ -176,14 +176,14 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 | `dorisPlugin.enabled` | 启用 Doris App 插件 | `true` |
 | `ingress.enabled` | 启用 Ingress | `false` |
 
-完整参数列表请参考 [values.yaml](./open-observability-stack/values.yaml)。
+完整参数列表请参考 [values.yaml](./ai-observe-stack/values.yaml)。
 
 ### 时区配置
 
 默认情况下，所有组件使用 **UTC** 时区。如需使用其他时区（如 `Asia/Shanghai`），设置 `openObservabilityStack.timezone`：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set openObservabilityStack.timezone=Asia/Shanghai
 ```
 
@@ -210,7 +210,7 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 kubectl create secret generic doris-credentials \
   --from-literal=username=root \
   --from-literal=password=mysecretpassword \
-  -n open-observability-stack
+  -n ai-observe-stack
 ```
 
 ### 在 values.yaml 中引用
@@ -232,7 +232,7 @@ doris:
 如果使用现有的 Doris 集群，需要禁用内部 Doris 并指定外部连接信息：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack \
   --set doris.mode=external \
   --set doris.external.host=172.19.0.12 \
   --set doris.external.port=9030 \
@@ -262,7 +262,7 @@ doris:
 ```
 
 ```bash
-helm install open-observability-stack . -n open-observability-stack -f values-external-doris.yaml
+helm install ai-observe-stack . -n ai-observe-stack -f values-external-doris.yaml
 ```
 
 > **注意：** 使用外部 Doris 时，`feHttpPort` 用于 Stream Load 操作（默认 8030）。如果你的 Doris FE 使用不同的 HTTP 端口，请确保正确设置。
@@ -276,7 +276,7 @@ helm install open-observability-stack . -n open-observability-stack -f values-ex
 适用于本地开发的最小资源配置：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f values-dev.yaml
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f values-dev.yaml
 ```
 
 特点：
@@ -290,7 +290,7 @@ helm install open-observability-stack open-observability-stack/open-observabilit
 高可用配置：
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f values-prod.yaml \
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f values-prod.yaml \
   --set grafana.adminPassword="CHANGE_ME_IN_PRODUCTION"
 ```
 
@@ -337,15 +337,15 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: oos.example.com
+    - host: aiobs.example.com
       paths:
         - path: /
           pathType: Prefix
           service: grafana
   tls:
-    - secretName: oos-tls
+    - secretName: aiobs-tls
       hosts:
-        - oos.example.com
+        - aiobs.example.com
 ```
 
 ### 持久化存储
@@ -382,41 +382,41 @@ grafana:
 升级到新版本：
 
 ```bash
-helm upgrade open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack -f your-values.yaml
+helm upgrade ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack -f your-values.yaml
 ```
 
 查看当前 Release：
 
 ```bash
-helm list -n open-observability-stack
+helm list -n ai-observe-stack
 ```
 
 ---
 
-## 卸载 Open Observability Stack
+## 卸载 AIObserve Stack
 
 删除部署：
 
 ```bash
-helm uninstall open-observability-stack -n open-observability-stack
+helm uninstall ai-observe-stack -n ai-observe-stack
 ```
 
 如果使用内部 Doris，可能需要手动删除 DorisCluster CR：
 
 ```bash
-kubectl delete doriscluster -n open-observability-stack --all
+kubectl delete doriscluster -n ai-observe-stack --all
 ```
 
 如需删除所有数据，删除 PVC：
 
 ```bash
-kubectl delete pvc -n open-observability-stack --all
+kubectl delete pvc -n ai-observe-stack --all
 ```
 
 删除命名空间（可选）：
 
 ```bash
-kubectl delete namespace open-observability-stack
+kubectl delete namespace ai-observe-stack
 ```
 
 ---
@@ -427,39 +427,39 @@ kubectl delete namespace open-observability-stack
 
 ```bash
 # OTel Collector 日志
-kubectl logs -l app.kubernetes.io/name=open-observability-stack-otel-collector -n open-observability-stack
+kubectl logs -l app.kubernetes.io/name=ai-observe-stack-otel-collector -n ai-observe-stack
 
 # Grafana 日志
-kubectl logs -l app.kubernetes.io/name=open-observability-stack-grafana -n open-observability-stack
+kubectl logs -l app.kubernetes.io/name=ai-observe-stack-grafana -n ai-observe-stack
 
 # Doris FE 日志
-kubectl logs -l app.kubernetes.io/component=fe -n open-observability-stack
+kubectl logs -l app.kubernetes.io/component=fe -n ai-observe-stack
 
 # Doris BE 日志
-kubectl logs -l app.kubernetes.io/component=be -n open-observability-stack
+kubectl logs -l app.kubernetes.io/component=be -n ai-observe-stack
 ```
 
 ### 调试安装失败
 
 ```bash
-helm install open-observability-stack open-observability-stack/open-observability-stack -n open-observability-stack --debug --dry-run
+helm install ai-observe-stack ai-observe-stack/ai-observe-stack -n ai-observe-stack --debug --dry-run
 ```
 
 ### 验证部署
 
 ```bash
-kubectl get pods -n open-observability-stack
-kubectl get svc -n open-observability-stack
-kubectl get doriscluster -n open-observability-stack
+kubectl get pods -n ai-observe-stack
+kubectl get svc -n ai-observe-stack
+kubectl get doriscluster -n ai-observe-stack
 ```
 
 ### 常见问题
 
 | 问题 | 解决方案 |
 |------|----------|
-| OTel Collector CrashLoopBackOff | 检查 Doris 连接：`kubectl logs open-observability-stack-otel-collector-0 -n open-observability-stack` |
-| Grafana 插件未加载 | 验证插件镜像已加载：`kubectl describe pod -l app.kubernetes.io/name=open-observability-stack-grafana -n open-observability-stack` |
-| Doris FE 未就绪 | 检查 Doris Operator 日志：`kubectl logs -l app.kubernetes.io/name=doris-operator -n open-observability-stack` |
+| OTel Collector CrashLoopBackOff | 检查 Doris 连接：`kubectl logs ai-observe-stack-otel-collector-0 -n ai-observe-stack` |
+| Grafana 插件未加载 | 验证插件镜像已加载：`kubectl describe pod -l app.kubernetes.io/name=ai-observe-stack-grafana -n ai-observe-stack` |
+| Doris FE 未就绪 | 检查 Doris Operator 日志：`kubectl logs -l app.kubernetes.io/name=doris-operator -n ai-observe-stack` |
 
 ---
 
@@ -479,7 +479,7 @@ kubectl get doriscluster -n open-observability-stack
 │                                  ▼                                       │
 │              ┌───────────────────────────────────┐                       │
 │              │   OpenTelemetry Collector         │                       │
-│              │   (open-observability-stack-otel-collector)       │                       │
+│              │   (ai-observe-stack-otel-collector)       │                       │
 │              └───────────────────┬───────────────┘                       │
 │                                  │ Doris Exporter (Stream Load)         │
 │                                  ▼                                       │
@@ -488,13 +488,13 @@ kubectl get doriscluster -n open-observability-stack
 │              │   ┌─────────┐    ┌─────────┐      │                       │
 │              │   │   FE    │    │   BE    │      │                       │
 │              │   └─────────┘    └─────────┘      │                       │
-│              │   (open-observability-stack-doris)                │                       │
+│              │   (ai-observe-stack-doris)                │                       │
 │              └───────────────────┬───────────────┘                       │
 │                                  │ MySQL 协议 (9030)                    │
 │                                  ▼                                       │
 │              ┌───────────────────────────────────┐                       │
 │              │   Grafana                         │                       │
-│              │   (open-observability-stack-grafana)              │                       │
+│              │   (ai-observe-stack-grafana)              │                       │
 │              │   + Doris App 插件                │                       │
 │              │   + 预置仪表盘                    │                       │
 │              └───────────────────────────────────┘                       │
@@ -512,11 +512,11 @@ kubectl get doriscluster -n open-observability-stack
 
 | 服务 | 端口 | 描述 |
 |------|------|------|
-| `open-observability-stack-otel-collector` | 4317 | OTLP gRPC 接收器 |
-| `open-observability-stack-otel-collector` | 4318 | OTLP HTTP 接收器 |
-| `open-observability-stack-otel-collector` | 8888 | Prometheus 指标 |
-| `open-observability-stack-grafana` | 3000 | Grafana Web UI |
-| `open-observability-stack-doris-fe-service` | 9030 | Doris MySQL 协议 |
-| `open-observability-stack-doris-fe-service` | 8030 | Doris FE HTTP (Stream Load) |
-| `open-observability-stack-doris-be-service` | 8040 | Doris BE HTTP |
+| `ai-observe-stack-otel-collector` | 4317 | OTLP gRPC 接收器 |
+| `ai-observe-stack-otel-collector` | 4318 | OTLP HTTP 接收器 |
+| `ai-observe-stack-otel-collector` | 8888 | Prometheus 指标 |
+| `ai-observe-stack-grafana` | 3000 | Grafana Web UI |
+| `ai-observe-stack-doris-fe-service` | 9030 | Doris MySQL 协议 |
+| `ai-observe-stack-doris-fe-service` | 8030 | Doris FE HTTP (Stream Load) |
+| `ai-observe-stack-doris-be-service` | 8040 | Doris BE HTTP |
 
