@@ -1,19 +1,19 @@
 # AIObserve Stack - Docker Compose
 
-AIObserve Stack (Doris + OTel + Grafana Doris App Plugin) is a complete observability solution where all components are distributed as standalone Docker images:
+AIObserve Stack (Doris + OTel + Grafana Doris App Plugin) 是一个完整的可观测性解决方案，所有组件都以独立的 Docker 镜像分发：
 
-- **Apache Doris** - High-performance real-time analytical database
-- **OpenTelemetry Collector** - Telemetry data collection gateway
-- **Grafana** - Visualization and monitoring dashboards
+- **Apache Doris** - 高性能实时分析数据库
+- **OpenTelemetry Collector** - 遥测数据采集网关
+- **Grafana** - 可视化与监控面板
 
-These images can be deployed together using Docker Compose.
+这些镜像可以通过 Docker Compose 组合部署。
 
-## Use Cases
+## 适用场景
 
-- Local testing and development
-- Proof of Concept (PoC)
+- 本地测试与开发
+- 概念验证 (PoC)
 
-## Architecture
+## 架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -51,123 +51,123 @@ These images can be deployed together using Docker Compose.
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Exposed Ports
+## 暴露端口
 
-Docker Compose exposes the following ports based on the default OTel Collector configuration:
+Docker Compose 基于默认 OTel Collector 配置暴露以下端口：
 
-| Port | Purpose |
-|------|---------|
+| 端口 | 用途 |
+|------|------|
 | `3000` | Grafana Web UI |
-| `4317` | OTLP gRPC receiver (standard endpoint for Traces, Logs, Metrics) |
-| `4318` | OTLP HTTP receiver (HTTP alternative to gRPC) |
-| `8888` | Prometheus metrics (Collector self-monitoring metrics) |
+| `4317` | OTLP gRPC receiver（Traces、Logs、Metrics 标准接收端口）|
+| `4318` | OTLP HTTP receiver（gRPC 的 HTTP 替代方案）|
+| `8888` | Prometheus metrics（Collector 自身监控指标）|
 | `8889` | Prometheus exporter metrics |
-| `9030` | Doris MySQL Protocol (query port) |
-| `13133` | Health check (`health_check` extension endpoint) |
-| `8030` | Doris FE HTTP (Web UI) |
+| `9030` | Doris MySQL Protocol（查询端口）|
+| `13133` | Health check（`health_check` 扩展端点）|
+| `8030` | Doris FE HTTP（Web UI）|
 
-These ports support integration with various telemetry data sources, enabling the OpenTelemetry Collector to meet diverse data collection needs.
+这些端口支持多种遥测数据源的集成，使 OpenTelemetry Collector 能够满足多样化的数据采集需求。
 
-## Deployment Steps
+## 部署步骤
 
-### 1. Clone the Repository
+### 1. 克隆仓库
 
 ```bash
 git clone https://github.com/velodb/ai-observe-stack.git
 cd ai-observe-stack/docker
 ```
 
-### 2. Start Services
+### 2. 启动服务
 
-If you already have an Apache Doris cluster, configure the connection info and start in external mode (deploys only OTel Collector + Grafana):
+如果已有 Apache Doris 集群，配置连接信息后以外部模式启动（仅部署 OTel Collector + Grafana）：
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your Doris connection details:
+编辑 `.env`，填入 Doris 连接地址：
 
 ```bash
-# Doris FE HTTP endpoint (for Stream Load)
+# Doris FE HTTP 端点（用于 Stream Load）
 DORIS_FE_HTTP_ENDPOINT=http://<DORIS_FE_HOST>:<FE_HTTP_PORT>
 
-# Doris FE MySQL endpoint (for queries)
+# Doris FE MySQL 端点（用于查询）
 DORIS_FE_MYSQL_ENDPOINT=<DORIS_FE_HOST>:<FE_MYSQL_PORT>
 
-# Doris credentials
+# Doris 认证信息
 DORIS_USERNAME=root
 DORIS_PASSWORD=
 ```
 
-Then start the services:
+然后启动服务：
 
 ```bash
 docker compose -f docker-compose-without-doris.yaml up -d
 ```
 
-If you don't have a Doris cluster, start the full stack with the built-in Doris using the default configuration:
+如果没有 Doris 集群，直接使用默认配置启动完整技术栈（包含内置 Doris）：
 
 ```bash
 docker compose up -d
 ```
 
-### 3. Verify Services
+### 3. 验证服务运行
 
 ```bash
 docker compose ps
 ```
 
-All services should show `running` status.
+所有服务应显示 `running` 状态。
 
-### 4. Access Grafana
+### 4. 访问 Grafana
 
-Visit http://localhost:3000 and log in with `admin` / `admin`.
+访问 http://localhost:3000 并使用 `admin` / `admin` 登录。
 
-## Access Endpoints
+## 访问端点
 
-| Service | URL/Endpoint | Credentials |
-|---------|--------------|-------------|
+| 服务 | URL/Endpoint | 凭据 |
+|------|--------------|------|
 | Grafana | http://localhost:3000 | admin / admin |
-| Doris FE UI | http://localhost:8030 | root / (empty) |
-| Doris MySQL | localhost:9030 | root / (empty) |
+| Doris FE UI | http://localhost:8030 | root / (空) |
+| Doris MySQL | localhost:9030 | root / (空) |
 | OTel gRPC | localhost:4317 | - |
 | OTel HTTP | localhost:4318 | - |
 | OTel Health | http://localhost:13133 | - |
 | OTel Metrics | http://localhost:8888/metrics | - |
 
-## Configuration
+## 修改配置
 
-### Environment Variables
+### 环境变量
 
-Modify configuration via `.env` file or environment variables:
+通过 `.env` 文件或环境变量修改配置：
 
 ```bash
-# Doris image version
+# Doris 镜像版本
 DORIS_IMAGE=apache/doris:4.0.3-all-slim
 
-# Port mappings
+# 端口映射
 DORIS_FE_HTTP_PORT=8030
 DORIS_FE_MYSQL_PORT=9030
 DORIS_BE_HTTP_PORT=8040
 ```
 
-### Timezone Configuration
+### 时区配置
 
-By default, all components use **UTC** timezone. To use a different timezone (e.g., `Asia/Shanghai`), you need to update two configurations to keep them in sync:
+默认情况下，所有组件使用 **UTC** 时区。如需使用其他时区（如 `Asia/Shanghai`），需要同时修改两处配置以保持一致：
 
-**1. Update OTel Collector Configuration**
+**1. 修改 OTel Collector 配置**
 
-Edit `otel-collector-config/otel-collector-config.yaml`:
+编辑 `otel-collector-config/otel-collector-config.yaml`：
 
 ```yaml
 exporters:
   doris:
-    timezone: Asia/Shanghai  # Change this
+    timezone: Asia/Shanghai  # 修改此处
 ```
 
-**2. Update Doris Container Timezone**
+**2. 修改 Doris 容器时区**
 
-Edit `docker-compose.yaml` and add the `TZ` environment variable to the doris service:
+编辑 `docker-compose.yaml`，为 doris 服务添加 `TZ` 环境变量：
 
 ```yaml
 services:
@@ -175,27 +175,27 @@ services:
     image: ${DORIS_IMAGE:-apache/doris:4.0.3-all-slim}
     environment:
       - SKIP_CHECK_ULIMIT=true
-      - TZ=Asia/Shanghai  # Add this line
+      - TZ=Asia/Shanghai  # 添加此行
 ```
 
-Restart services after changes:
+修改后重启服务：
 
 ```bash
 docker compose down && docker compose up -d
 ```
 
-> **Important**: Both timezone settings must match. Otherwise, Grafana dashboards will display time incorrectly (e.g., "Last 15 minutes" queries return no data).
+> **重要**：两处时区配置必须保持一致，否则会导致 Grafana Dashboard 中时间显示异常（如 "Last 15 minutes" 查询无数据）。
 
-### Configuring OpenTelemetry Collector
+### 配置 OpenTelemetry Collector
 
-The OTel Collector configuration file is located at `otel-collector-config/otel-collector-config.yaml`.
+OTel Collector 配置文件位于 `otel-collector-config/otel-collector-config.yaml`。
 
-You can modify:
-- Add/modify receivers (e.g., Prometheus, Jaeger, Zipkin, Fluentd)
-- Adjust batch processing parameters
-- Configure additional exporters
+可以修改的内容包括：
+- 添加/修改 receivers（如 Prometheus、Jaeger、Zipkin、Fluentd）
+- 调整 batch 处理参数
+- 配置额外的 exporters
 
-Example - Adding a Fluentd receiver:
+示例 - 添加 Fluentd receiver：
 
 ```yaml
 receivers:
@@ -209,33 +209,33 @@ receivers:
     endpoint: 0.0.0.0:24224
 ```
 
-### Configuring Grafana
+### 配置 Grafana
 
-- Datasource config: `grafana/provisioning/datasources/datasources.yaml`
-- Dashboard config: `grafana/provisioning/dashboards/dashboards.yaml`
-- Dashboard JSON files: `grafana/dashboards/`
+- 数据源配置: `grafana/provisioning/datasources/datasources.yaml`
+- Dashboard 配置: `grafana/provisioning/dashboards/dashboards.yaml`
+- Dashboard JSON 文件: `grafana/dashboards/`
 
-## Data Schema
+## 数据 Schema
 
-AIObserve Stack automatically creates three main tables in Doris:
+AIObserve Stack 在 Doris 中自动创建三张主要表：
 
-| Table | Purpose |
-|-------|---------|
-| `otel.otel_traces` | Distributed tracing data |
-| `otel.otel_logs` | Log data |
-| `otel.otel_metrics` | Metrics data |
+| 表名 | 用途 |
+|------|------|
+| `otel.otel_traces` | 分布式追踪数据 |
+| `otel.otel_logs` | 日志数据 |
+| `otel.otel_metrics` | 指标数据 |
 
-All tables feature:
-- Dynamic partitioning (7-day retention by default)
-- Inverted indexes for accelerated search
-- Duplicate Key model (append-only writes)
+所有表的特性：
+- 动态分区（默认保留 7 天）
+- 倒排索引加速搜索
+- Duplicate Key 模型（追加写入）
 
-## Sending Test Data
+## 发送测试数据
 
-### Using otel-cli
+### 使用 otel-cli
 
 ```bash
-# Send a test trace
+# 发送测试 trace
 otel-cli exec \
   --endpoint localhost:4317 \
   --service my-service \
@@ -243,10 +243,10 @@ otel-cli exec \
   -- echo "Hello AIObserve Stack!"
 ```
 
-### Using curl (OTLP/HTTP)
+### 使用 curl (OTLP/HTTP)
 
 ```bash
-# Send a test log
+# 发送测试日志
 curl -X POST http://localhost:4318/v1/logs \
   -H "Content-Type: application/json" \
   -d '{
@@ -265,31 +265,31 @@ curl -X POST http://localhost:4318/v1/logs \
   }'
 ```
 
-## Troubleshooting
+## 故障排查
 
-### Check OTel Collector Health
+### 检查 OTel Collector 健康状态
 
 ```bash
 curl http://localhost:13133/
 ```
 
-### Check Doris Status
+### 检查 Doris 状态
 
 ```bash
-# Check BE status
+# 检查 BE 状态
 mysql -h 127.0.0.1 -P 9030 -uroot -e "SHOW BACKENDS\G"
 
-# Or check from inside the container
+# 或进入容器检查
 docker exec -it doris mysql -h 127.0.0.1 -P 9030 -uroot -e "SHOW BACKENDS\G"
 ```
 
-### View OTel Collector Logs
+### 查看 OTel Collector 日志
 
 ```bash
 docker compose logs otel-collector -f
 ```
 
-### Verify Data in Doris
+### 验证 Doris 中的数据
 
 ```bash
 docker exec -it doris mysql -h 127.0.0.1 -P 9030 -uroot -e "
@@ -301,32 +301,33 @@ SELECT 'metrics', COUNT(*) FROM otel.otel_metrics;
 "
 ```
 
-### Check Container Status
+### 检查容器状态
 
 ```bash
 docker compose ps
 ```
 
-All services should show `healthy` status.
+所有服务应显示为 `healthy` 状态。
 
-## Stopping Services
+## 停止服务
 
-Built-in Doris mode:
+内置 Doris 模式：
 
 ```bash
-# Stop services (keep data)
+# 停止服务（保留数据）
 docker compose down
 
-# Stop services and remove volumes
+# 停止服务并删除数据卷
 docker compose down -v
 ```
 
-External Doris mode:
+外部 Doris 模式：
 
 ```bash
-# Stop services (keep data)
+# 停止服务（保留数据）
 docker compose -f docker-compose-without-doris.yaml down
 
-# Stop services and remove volumes
+# 停止服务并删除数据卷
 docker compose -f docker-compose-without-doris.yaml down -v
 ```
+
