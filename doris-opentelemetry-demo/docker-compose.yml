@@ -717,7 +717,7 @@ services:
   # OpenTelemetry Collector
   otel-collector:
     image: ${COLLECTOR_CONTRIB_IMAGE}
-    container_name: otel-collector
+    container_name: demo-otel-collector
     deploy:
       resources:
         limits:
