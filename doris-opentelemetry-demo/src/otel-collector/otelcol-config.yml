@@ -90,36 +90,10 @@ exporters:
     endpoint: "http://prometheus:9090/api/v1/otlp"
     tls:
       insecure: true
-  doris:
-    endpoint: "http://doris:8040"
-    database: otel
-    username: admin
-    password:
-    table:
-      logs: otel_logs
-      traces: otel_traces
-      metrics: otel_metrics
-    create_schema: true
-    mysql_endpoint: "doris:9030"
-    history_days: 30
-    create_history_days: 0
-    replication_num: 1
-    timezone: Asia/Shanghai
-    timeout: 60s
-    #log_response: true
-    #label_prefix: otel
-    headers:
-      # load_to_single_tablet: "true"
-      max_filter_ratio: "1"
-    sending_queue:
-      enabled: true
-      num_consumers: 10
-      queue_size: 1000
-    retry_on_failure:
-      enabled: true
-      initial_interval: 5s
-      max_interval: 30s
-      max_elapsed_time: 300s
+  otlp/gateway:
+    endpoint: "host.docker.internal:4317"
+    tls:
+      insecure: true
 
 processors:
   batch:
@@ -146,15 +120,15 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, transform, batch]
-      exporters: [otlp, debug, spanmetrics, doris]
+      exporters: [otlp, debug, spanmetrics, otlp/gateway]
     metrics:
       receivers: [hostmetrics, docker_stats, httpcheck/frontend-proxy, otlp, redis, spanmetrics]
       processors: [memory_limiter, batch]
-      exporters: [doris, otlphttp/prometheus, debug]
+      exporters: [otlp/gateway, otlphttp/prometheus, debug]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [doris, debug]
+      exporters: [otlp/gateway, debug]
   telemetry:
     metrics:
       level: detailed
