@@ -43,6 +43,8 @@ static_resources:
                           route: { cluster: opentelemetry_collector_http, prefix_rewrite: "/" }
                         - match: { prefix: "/jaeger" }
                           route: { cluster: jaeger }
+                        - match: { prefix: "/grafana" }
+                          route: { cluster: grafana }
                         - match: { prefix: "/images/" }
                           route: { cluster: image-provider, prefix_rewrite: "/" }
                         - match: { prefix: "/flagservice/" }
@@ -206,6 +208,18 @@ static_resources:
                     socket_address:
                       address: ${LOCUST_WEB_HOST}
                       port_value: ${LOCUST_WEB_PORT}
+    - name: grafana
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: grafana
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: ${GRAFANA_HOST}
+                      port_value: ${GRAFANA_PORT}
     - name: jaeger
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN

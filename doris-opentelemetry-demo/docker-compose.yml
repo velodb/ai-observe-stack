@@ -353,6 +353,8 @@ services:
       - FLAGD_PORT
       - FLAGD_UI_HOST
       - FLAGD_UI_PORT
+      - GRAFANA_HOST
+      - GRAFANA_PORT
     depends_on:
       frontend:
         condition: service_started
