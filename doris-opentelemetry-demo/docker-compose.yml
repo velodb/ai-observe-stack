@@ -12,9 +12,6 @@ networks:
   default:
     name: doris-opentelemetry-demo
     driver: bridge
-  aiobs-net:
-    external: true
-    name: aiobs-net
 
 services:
   # ******************
@@ -749,9 +746,8 @@ services:
       - OTEL_COLLECTOR_PORT_GRPC
       - OTEL_COLLECTOR_PORT_HTTP
       - GOMEMLIMIT=160MiB
-    networks:
-      - default
-      - aiobs-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Prometheus
   prometheus:

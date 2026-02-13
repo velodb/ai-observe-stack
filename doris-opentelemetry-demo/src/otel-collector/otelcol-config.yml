@@ -91,7 +91,7 @@ exporters:
     tls:
       insecure: true
   otlp/gateway:
-    endpoint: "otel-collector:4317"
+    endpoint: "host.docker.internal:4317"
     tls:
       insecure: true
 

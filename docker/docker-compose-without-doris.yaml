@@ -92,5 +92,4 @@ volumes:
 # =============================================================================
 networks:
   aiobs-net:
-    name: aiobs-net
     driver: bridge
