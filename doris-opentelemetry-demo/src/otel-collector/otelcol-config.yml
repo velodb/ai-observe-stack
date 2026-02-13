@@ -139,4 +139,4 @@ service:
             exporter:
               otlp:
                 protocol: grpc
-                endpoint: localhost:${env:OTEL_COLLECTOR_PORT_GRPC}
+                endpoint: ${env:OTEL_COLLECTOR_HOST}:${env:OTEL_COLLECTOR_PORT_GRPC}
