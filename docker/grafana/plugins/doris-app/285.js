@@ -1,7 +1,38 @@
 "use strict";
-(self["webpackChunkdoris_app"] = self["webpackChunkdoris_app"] || []).push([[382],{
+(self["webpackChunkdoris_app"] = self["webpackChunkdoris_app"] || []).push([[285],{
 
-/***/ 382:
+/***/ 5611:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   b: () => (/* binding */ testIds)
+/* harmony export */ });
+const testIds = {
+    appConfig: {
+        apiKey: 'data-testid ac-api-key',
+        apiUrl: 'data-testid ac-api-url',
+        submit: 'data-testid ac-submit-form'
+    },
+    pageOne: {
+        container: 'data-testid pg-one-container',
+        navigateToFour: 'data-testid navigate-to-four'
+    },
+    pageTwo: {
+        container: 'data-testid pg-two-container'
+    },
+    pageThree: {
+        container: 'data-testid pg-three-container'
+    },
+    pageFour: {
+        container: 'data-testid pg-four-container',
+        navigateBack: 'data-testid navigate-back'
+    }
+};
+
+
+/***/ }),
+
+/***/ 9285:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -21,8 +52,8 @@ var css_ = __webpack_require__(6089);
 var runtime_ = __webpack_require__(8531);
 // EXTERNAL MODULE: external "@grafana/ui"
 var ui_ = __webpack_require__(2007);
-// EXTERNAL MODULE: ../node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.11.1_@types+react@19.2.2_react@17.0.2__@types+react@19.2.2_react@17.0.2/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js + 8 modules
-var emotion_styled_browser_esm = __webpack_require__(31);
+// EXTERNAL MODULE: ../node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js + 8 modules
+var emotion_styled_browser_esm = __webpack_require__(2742);
 ;// ./components/discover-filter/discover-filter.style.ts
 
 
@@ -94,20 +125,20 @@ const footerStyle = (0,css_.css)`
     }
 `;
 
-// EXTERNAL MODULE: ../node_modules/react-i18next/dist/es/index.js + 27 modules
-var es = __webpack_require__(9496);
-// EXTERNAL MODULE: ../node_modules/.pnpm/jotai@2.15.0_@babel+core@7.28.4_@babel+template@7.27.2_@types+react@19.2.2_react@17.0.2/node_modules/jotai/esm/react.mjs
-var react = __webpack_require__(122);
-// EXTERNAL MODULE: ../node_modules/.pnpm/nanoid@5.1.6/node_modules/nanoid/index.browser.js + 1 modules
-var index_browser = __webpack_require__(8776);
+// EXTERNAL MODULE: ../node_modules/react-i18next/dist/es/index.js + 15 modules
+var es = __webpack_require__(9315);
+// EXTERNAL MODULE: ../node_modules/jotai/esm/react.mjs
+var react = __webpack_require__(3689);
+// EXTERNAL MODULE: ../node_modules/nanoid/index.browser.js + 1 modules
+var index_browser = __webpack_require__(8987);
 // EXTERNAL MODULE: ./store/discover.ts
-var discover = __webpack_require__(2539);
+var discover = __webpack_require__(6247);
 // EXTERNAL MODULE: ./utils/data.ts
-var utils_data = __webpack_require__(9008);
+var utils_data = __webpack_require__(6700);
 // EXTERNAL MODULE: ../node_modules/react-hook-form/dist/index.esm.js
 var index_esm = __webpack_require__(4199);
-// EXTERNAL MODULE: ../node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/uniqBy.js + 9 modules
-var uniqBy = __webpack_require__(7892);
+// EXTERNAL MODULE: ../node_modules/lodash-es/uniqBy.js + 9 modules
+var uniqBy = __webpack_require__(9851);
 ;// ./components/discover-filter/filter-content.tsx
 function _define_property(obj, key, value) {
     if (key in obj) {
@@ -810,10 +841,10 @@ const getFieldIcon = (columnType)=>{
     return currentColumnType === null || currentColumnType === void 0 ? void 0 : currentColumnType.icon;
 };
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs
-var clsx = __webpack_require__(3372);
-// EXTERNAL MODULE: ../node_modules/.pnpm/tailwind-merge@2.6.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs
-var bundle_mjs = __webpack_require__(7297);
+// EXTERNAL MODULE: ../node_modules/clsx/dist/clsx.mjs
+var clsx = __webpack_require__(1750);
+// EXTERNAL MODULE: ../node_modules/tailwind-merge/dist/bundle-mjs.mjs
+var bundle_mjs = __webpack_require__(8890);
 ;// ./utils/tailwind.ts
 
 
@@ -821,10 +852,10 @@ function cn(...inputs) {
     return (0,bundle_mjs/* twMerge */.QP)((0,clsx/* clsx */.$)(inputs));
 }
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/antd@5.27.6_date-fns@2.30.0_moment@2.29.4_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/antd/es/progress/index.js + 15 modules
-var progress = __webpack_require__(3113);
-// EXTERNAL MODULE: ../node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/get.js
-var get = __webpack_require__(7981);
+// EXTERNAL MODULE: ../node_modules/antd/es/progress/index.js + 15 modules
+var progress = __webpack_require__(9351);
+// EXTERNAL MODULE: ../node_modules/lodash-es/get.js
+var get = __webpack_require__(7230);
 ;// ./components/discover-sidebar/field-item/top-data/top-data.tsx
 
 
@@ -1324,15 +1355,15 @@ function DiscoverSidebar() {
         }))))));
 }
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/echarts-for-react@3.0.2_echarts@5.6.0_react@17.0.2/node_modules/echarts-for-react/esm/index.js + 557 modules
-var esm = __webpack_require__(4059);
-// EXTERNAL MODULE: ../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/dayjs.min.js
-var dayjs_min = __webpack_require__(228);
+// EXTERNAL MODULE: ../node_modules/echarts-for-react/esm/index.js + 557 modules
+var esm = __webpack_require__(1244);
+// EXTERNAL MODULE: ../node_modules/dayjs/dayjs.min.js
+var dayjs_min = __webpack_require__(5285);
 var dayjs_min_default = /*#__PURE__*/__webpack_require__.n(dayjs_min);
 // EXTERNAL MODULE: ./types/type.ts
-var type = __webpack_require__(6452);
+var type = __webpack_require__(7944);
 // EXTERNAL MODULE: ./constants.ts + 1 modules
-var constants = __webpack_require__(2560);
+var constants = __webpack_require__(2351);
 ;// ./components/discover-histogram/index.tsx
 function discover_histogram_define_property(obj, key, value) {
     if (key in obj) {
@@ -1637,14 +1668,14 @@ function DiscoverHistogram() {
     })));
 }
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/antd@5.27.6_date-fns@2.30.0_moment@2.29.4_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/antd/es/tooltip/index.js + 91 modules
-var tooltip = __webpack_require__(8644);
-// EXTERNAL MODULE: ../node_modules/.pnpm/antd@5.27.6_date-fns@2.30.0_moment@2.29.4_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/antd/es/button/index.js + 19 modules
-var es_button = __webpack_require__(3682);
-// EXTERNAL MODULE: ../node_modules/.pnpm/@tanstack+react-table@8.21.3_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/@tanstack/react-table/build/lib/index.mjs
-var lib = __webpack_require__(3248);
-// EXTERNAL MODULE: ../node_modules/.pnpm/@tanstack+table-core@8.21.3/node_modules/@tanstack/table-core/build/lib/index.mjs
-var build_lib = __webpack_require__(7608);
+// EXTERNAL MODULE: ../node_modules/antd/es/tooltip/index.js + 90 modules
+var tooltip = __webpack_require__(5395);
+// EXTERNAL MODULE: ../node_modules/antd/es/button/index.js + 34 modules
+var es_button = __webpack_require__(7413);
+// EXTERNAL MODULE: ../node_modules/@tanstack/react-table/build/lib/index.mjs
+var lib = __webpack_require__(7796);
+// EXTERNAL MODULE: ../node_modules/@tanstack/table-core/build/lib/index.mjs
+var build_lib = __webpack_require__(6666);
 ;// ./components/selectdb-ui/sd-collapsible-table/index.tsx
 
 
@@ -1908,8 +1939,8 @@ function ContentItem({ fieldName, fieldValue, fieldType }) {
     })));
 }
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/ahooks@3.9.5_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/ahooks/es/useRequest/index.js + 32 modules
-var useRequest = __webpack_require__(8533);
+// EXTERNAL MODULE: ../node_modules/ahooks/es/useRequest/index.js + 31 modules
+var useRequest = __webpack_require__(5494);
 ;// ./components/surrounding-logs/surrounding-content-item.tsx
 
 
@@ -2644,8 +2675,8 @@ function SurroundingDiscoverFilter(props) {
     }))));
 }
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/sortBy.js + 7 modules
-var sortBy = __webpack_require__(7739);
+// EXTERNAL MODULE: ../node_modules/lodash-es/sortBy.js + 7 modules
+var sortBy = __webpack_require__(5092);
 ;// ./services/sql.ts
 function getQueryTableResultSQL(params) {
     const indexesStatement = params.indexes_statement;
@@ -2762,6 +2793,8 @@ function transformFieldPath(fieldPath) {
     return parts[0] + parts.slice(1).map((part)=>`['${part}']`).join('');
 }
 
+// EXTERNAL MODULE: ./components/with-error-handler/withErrorHandler.tsx
+var withErrorHandler = __webpack_require__(6472);
 ;// ./services/discover.ts
 function _object_without_properties(source, excluded) {
     if (source == null) return {};
@@ -2792,12 +2825,13 @@ function _object_without_properties_loose(source, excluded) {
 }
 
 
+
 function getTableDataService(payload) {
     const { selectdbDS } = payload, rest = _object_without_properties(payload, [
         "selectdbDS"
     ]);
     const QueryTableResultSQL = getQueryTableResultSQL(rest);
-    const response = (0,runtime_.getBackendSrv)().fetch({
+    const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: {
@@ -2814,7 +2848,7 @@ function getTableDataService(payload) {
             ]
         },
         credentials: 'include'
-    });
+    }));
     return response;
 }
 function getTableDataChartsService(payload) {
@@ -2822,7 +2856,7 @@ function getTableDataChartsService(payload) {
         "selectdbDS"
     ]);
     const QueryTableChartsSQL = getQueryTableChartsSQL(rest);
-    const response = (0,runtime_.getBackendSrv)().fetch({
+    const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: {
@@ -2839,7 +2873,7 @@ function getTableDataChartsService(payload) {
             ]
         },
         credentials: 'include'
-    });
+    }));
     return response;
 }
 function getTopDataService(payload) {
@@ -2847,7 +2881,7 @@ function getTopDataService(payload) {
         "selectdbDS"
     ]);
     const QueryTableResultSQL = getQueryTableResultSQL(rest);
-    const response = (0,runtime_.getBackendSrv)().fetch({
+    const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: {
@@ -2864,7 +2898,7 @@ function getTopDataService(payload) {
             ]
         },
         credentials: 'include'
-    });
+    }));
     return response;
 }
 function getTableDataCountService(payload) {
@@ -2872,7 +2906,7 @@ function getTableDataCountService(payload) {
         "selectdbDS"
     ]);
     const QueryTableResultCountSQL = getQueryTableResultCountSQL(rest);
-    const response = (0,runtime_.getBackendSrv)().fetch({
+    const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: {
@@ -2889,7 +2923,7 @@ function getTableDataCountService(payload) {
             ]
         },
         credentials: 'include'
-    });
+    }));
     return response;
 }
 function getSurroundingDataService(payload) {
@@ -2897,7 +2931,7 @@ function getSurroundingDataService(payload) {
         "selectdbDS"
     ]);
     const surroundingSQL = getSurroundingSQL(rest);
-    const response = (0,runtime_.getBackendSrv)().fetch({
+    const response = (0,withErrorHandler/* withErrorHandler */.F)((0,runtime_.getBackendSrv)().fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: {
@@ -2914,14 +2948,14 @@ function getSurroundingDataService(payload) {
             ]
         },
         credentials: 'include'
-    });
+    }));
     return response;
 }
 
 // EXTERNAL MODULE: external "rxjs"
 var external_rxjs_ = __webpack_require__(1269);
 // EXTERNAL MODULE: ./utils/utils.ts
-var utils = __webpack_require__(8763);
+var utils = __webpack_require__(2551);
 ;// ./components/surrounding-logs/content/content-table-actions.tsx
 
 
@@ -3681,7 +3715,7 @@ function SurroundingLogs() {
 }
 
 // EXTERNAL MODULE: ./components/trace-detail/index.tsx
-var trace_detail = __webpack_require__(7273);
+var trace_detail = __webpack_require__(1885);
 // EXTERNAL MODULE: external "@grafana/data"
 var data_ = __webpack_require__(7781);
 ;// ./components/discover-content/index.tsx
@@ -3805,9 +3839,8 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
     const context = (0,data_.usePluginContext)();
     // user settings
     const jsonData = context.meta.jsonData || {};
-    console.log('jsonData', jsonData);
     const { logsConfig = {} } = jsonData;
-    const { database = "", datasource = {}, logsTable = "", targetTraceTable = "" } = logsConfig;
+    const { database = "", datasource = {}, logsTable = "", targetTraceTable = utils_data/* INIT_DEMO_DATA */.I$.tracesTable } = logsConfig;
     // local input state for page-jump control
     const [jumpPage, setJumpPage] = (0,external_react_.useState)(String(page));
     (0,external_react_.useEffect)(()=>{
@@ -3815,7 +3848,7 @@ function DiscoverContent({ fetchNextPage, getTraceData }) {
     }, [
         page
     ]);
-    const isTargetLogTable = discoverCurrent.table === logsTable && discoverCurrent.database === database && (currentDatasource === null || currentDatasource === void 0 ? void 0 : currentDatasource.id) === (datasource === null || datasource === void 0 ? void 0 : datasource.id);
+    const isTargetLogTable = true;
     (0,external_react_.useEffect)(()=>{
         if (theme.isDark) {
             setFieldKeyBg('#3f3f4f');
@@ -4568,7 +4601,7 @@ function SQLSearch({ style, onQuerying }) {
 }
 
 // EXTERNAL MODULE: ./services/metaservice.ts
-var metaservice = __webpack_require__(6965);
+var metaservice = __webpack_require__(8161);
 ;// ./components/discover-header/lucene.tsx
 
 
@@ -4602,6 +4635,35 @@ function Lucene({ onQuerying }) {
 
 ;// ./components/discover-header/index.tsx
 'use client';
+function discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+        var info = gen[key](arg);
+        var value = info.value;
+    } catch (error) {
+        reject(error);
+        return;
+    }
+    if (info.done) {
+        resolve(value);
+    } else {
+        Promise.resolve(value).then(_next, _throw);
+    }
+}
+function discover_header_async_to_generator(fn) {
+    return function() {
+        var self = this, args = arguments;
+        return new Promise(function(resolve, reject) {
+            var gen = fn.apply(self, args);
+            function _next(value) {
+                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+            }
+            function _throw(err) {
+                discover_header_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+            }
+            _next(undefined);
+        });
+    };
+}
 function discover_header_define_property(obj, key, value) {
     if (key in obj) {
         Object.defineProperty(obj, key, {
@@ -4669,6 +4731,7 @@ function discover_header_object_spread_props(target, source) {
 
 
 
+
 function DiscoverHeader(props) {
     // const catalog = 'internal';
     // const catalogs = useAtomValue(catalogAtom);
@@ -4699,6 +4762,7 @@ function DiscoverHeader(props) {
     const [databases, setDatabases] = (0,react/* useAtom */.fp)(discover/* databasesAtom */.SK);
     const [tables, setTables] = (0,react/* useAtom */.fp)(discover/* tablesAtom */.b9);
     const [_datasources] = (0,react/* useAtom */.fp)(discover/* datasourcesAtom */.ui);
+    const [initDataSource, setInitDataSource] = (0,react/* useAtom */.fp)(discover/* initDS */.cw);
     const searchType = (0,react/* useAtomValue */.md)(discover/* searchTypeAtom */.WM);
     const searchMode = searchType === 'Search';
     const selectdbDS = (0,react/* useAtomValue */.md)(discover/* selectedDatasourceAtom */.SW);
@@ -4744,7 +4808,6 @@ function DiscoverHeader(props) {
             next: ({ data, ok })=>{
                 if (ok) {
                     const frame = (0,data_.toDataFrame)(data.results.getFields.frames[0]);
-                    console.log('frame', frame);
                     const values = Array.from(frame.fields[0].values);
                     const fieldTypes = Array.from(frame.fields[1].values);
                     const tableFields = values.map((item, index)=>{
@@ -4766,7 +4829,6 @@ function DiscoverHeader(props) {
                                 value: item
                             };
                         });
-                        console.log('bbb,', discoverCurrent);
                         setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
                             table: selectedTable.value,
                             timeField: ((_options_ = options[0]) === null || _options_ === void 0 ? void 0 : _options_.value) || ''
@@ -4816,6 +4878,55 @@ function DiscoverHeader(props) {
             }
         });
     }
+    function initHeaderData() {
+        return discover_header_async_to_generator(function*() {
+            const ds = yield (0,runtime_.getDataSourceSrv)().get({
+                uid: utils_data/* INIT_DEMO_DATA */.I$.dsUid
+            });
+            setInitDataSource(ds);
+            setSelectedDatasource(ds);
+        })();
+    }
+    (0,external_react_.useEffect)(()=>{
+        if (initDataSource) {
+            fetchDatabases(initDataSource);
+            (0,metaservice/* getTablesService */.Rw)({
+                selectdbDS: initDataSource,
+                database: utils_data/* INIT_DEMO_DATA */.I$.datasource
+            }).subscribe({
+                next: (resp)=>{
+                    const { data, ok } = resp;
+                    if (ok) {
+                        const frame = (0,data_.toDataFrame)(data.results.getTables.frames[0]);
+                        const values = Array.from(frame.fields[0].values);
+                        const options = values.map((item)=>({
+                                label: item,
+                                value: item
+                            }));
+                        setTables(options);
+                        setCurrentTable(utils_data/* INIT_DEMO_DATA */.I$.logTable);
+                        setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
+                            database: utils_data/* INIT_DEMO_DATA */.I$.datasource,
+                            table: utils_data/* INIT_DEMO_DATA */.I$.logTable
+                        }));
+                        getFields({
+                            value: utils_data/* INIT_DEMO_DATA */.I$.logTable
+                        });
+                        getIndexes({
+                            value: utils_data/* INIT_DEMO_DATA */.I$.logTable
+                        });
+                        props === null || props === void 0 ? void 0 : props.onQuerying();
+                    }
+                },
+                error: (err)=>console.log('Fetch Error', err)
+            });
+        }
+    }, [
+        initDataSource
+    ]);
+    (0,external_react_.useEffect)(()=>{
+        initHeaderData();
+    }, []);
     return /*#__PURE__*/ external_react_default().createElement("div", {
         className: (0,css_.css)`
                 padding: 1rem;
@@ -4836,7 +4947,6 @@ function DiscoverHeader(props) {
         noDefault: true,
         filter: (ds)=>ds.type === 'mysql',
         onChange: (item)=>{
-            console.log('item', item);
             setSelectedDatasource(item);
             // Always fetch databases even if the same datasource is selected
             fetchDatabases(item);
@@ -4883,7 +4993,6 @@ function DiscoverHeader(props) {
         width: 15,
         value: currentTable,
         onChange: (selectedTable)=>{
-            console.log('selectedTable.value', selectedTable.value);
             setDiscoverCurrent(discover_header_object_spread_props(discover_header_object_spread({}, discoverCurrent), {
                 table: selectedTable.value
             }));
@@ -4987,13 +5096,13 @@ function DiscoverHeader(props) {
 }
 
 // EXTERNAL MODULE: ./components/testIds.ts
-var testIds = __webpack_require__(3455);
+var testIds = __webpack_require__(5611);
 // EXTERNAL MODULE: ./services/traces.ts + 1 modules
-var traces = __webpack_require__(4338);
-// EXTERNAL MODULE: ../node_modules/.pnpm/antd@5.27.6_date-fns@2.30.0_moment@2.29.4_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/antd/es/message/index.js + 38 modules
-var message = __webpack_require__(5334);
-// EXTERNAL MODULE: ../node_modules/.pnpm/@hyperdx+lucene@3.1.1/node_modules/@hyperdx/lucene/lib/lucene.js
-var lucene = __webpack_require__(3596);
+var traces = __webpack_require__(3764);
+// EXTERNAL MODULE: ../node_modules/antd/es/message/index.js + 38 modules
+var message = __webpack_require__(4749);
+// EXTERNAL MODULE: ../node_modules/@hyperdx/lucene/lib/lucene.js
+var lucene = __webpack_require__(9894);
 ;// ./utils/query-parser/tokenUtils.ts
 function encodeSpecialTokens(query) {
     return query.replace(/\\\\/g, 'HDX_BACKSLASH_LITERAL').replace('http://', 'http_COLON_//').replace('https://', 'https_COLON_//').replace(/localhost:(\d{1,5})/, 'localhost_COLON_$1').replace(/\\:/g, 'HDX_COLON');
@@ -5359,7 +5468,7 @@ class SQLSerializer {
                     normTerm === 'true' ? 1 : normTerm === 'false' ? 0 : parseInt(normTerm, 10)
                 ]);
             } else if (propertyType === JSDataType.Number) {
-                return sqlstring_browser.format(`(${column} ${isNegatedField ? '!' : ''}= CAST(?, 'Float64'))`, [
+                return sqlstring_browser.format(`(${column} ${isNegatedField ? '!' : ''}= CAST(? AS DOUBLE))`, [
                     term
                 ]);
             } else if (propertyType === JSDataType.JSON) {
@@ -5484,7 +5593,7 @@ class SQLSerializer {
                     normTerm === 'true' ? 1 : normTerm === 'false' ? 0 : parseInt(normTerm, 10)
                 ]);
             } else if (propertyType === JSDataType.Number) {
-                return sqlstring_browser.format(`(?? ${isNegatedField ? '!' : ''}= CAST(?, 'Float64'))`, [
+                return sqlstring_browser.format(`(?? ${isNegatedField ? '!' : ''}= CAST(? AS DOUBLE))`, [
                     column,
                     term
                 ]);
@@ -5523,7 +5632,7 @@ class SQLSerializer {
                             if (!identifier) {
                                 return null;
                             }
-                            return sqlstring_browser.format(`(?? = CAST(?, 'Float64'))`, [
+                            return sqlstring_browser.format(`(?? = CAST(? AS DOUBLE))`, [
                                 identifier,
                                 term
                             ]);
@@ -6908,38 +7017,7 @@ function PageDiscover() {
 }
 
 
-/***/ }),
-
-/***/ 3455:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   b: () => (/* binding */ testIds)
-/* harmony export */ });
-const testIds = {
-    appConfig: {
-        apiKey: 'data-testid ac-api-key',
-        apiUrl: 'data-testid ac-api-url',
-        submit: 'data-testid ac-submit-form'
-    },
-    pageOne: {
-        container: 'data-testid pg-one-container',
-        navigateToFour: 'data-testid navigate-to-four'
-    },
-    pageTwo: {
-        container: 'data-testid pg-two-container'
-    },
-    pageThree: {
-        container: 'data-testid pg-three-container'
-    },
-    pageFour: {
-        container: 'data-testid pg-four-container',
-        navigateBack: 'data-testid navigate-back'
-    }
-};
-
-
 /***/ })
 
 }]);
-//# sourceMappingURL=382.js.map?_cache=e94df3781c745de07e6e
+//# sourceMappingURL=285.js.map?_cache=b373d6c4ccbf93081e71

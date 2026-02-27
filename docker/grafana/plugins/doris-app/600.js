@@ -1,7 +1,7 @@
 "use strict";
-(self["webpackChunkdoris_app"] = self["webpackChunkdoris_app"] || []).push([[824],{
+(self["webpackChunkdoris_app"] = self["webpackChunkdoris_app"] || []).push([[600],{
 
-/***/ 6824:
+/***/ 2600:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -15,7 +15,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: external "react"
 var external_react_ = __webpack_require__(5959);
 var external_react_default = /*#__PURE__*/__webpack_require__.n(external_react_);
-;// ../node_modules/.pnpm/lucide-react@0.513.0_react@17.0.2/node_modules/lucide-react/dist/esm/shared/src/utils.js
+;// ../node_modules/lucide-react/dist/esm/shared/src/utils.js
 /**
  * @license lucide-react v0.513.0 - ISC
  *
@@ -46,7 +46,7 @@ const hasA11yProp = (props) => {
 
 //# sourceMappingURL=utils.js.map
 
-;// ../node_modules/.pnpm/lucide-react@0.513.0_react@17.0.2/node_modules/lucide-react/dist/esm/defaultAttributes.js
+;// ../node_modules/lucide-react/dist/esm/defaultAttributes.js
 /**
  * @license lucide-react v0.513.0 - ISC
  *
@@ -69,7 +69,7 @@ var defaultAttributes = {
 
 //# sourceMappingURL=defaultAttributes.js.map
 
-;// ../node_modules/.pnpm/lucide-react@0.513.0_react@17.0.2/node_modules/lucide-react/dist/esm/Icon.js
+;// ../node_modules/lucide-react/dist/esm/Icon.js
 /**
  * @license lucide-react v0.513.0 - ISC
  *
@@ -114,7 +114,7 @@ const Icon = (0,external_react_.forwardRef)(
 
 //# sourceMappingURL=Icon.js.map
 
-;// ../node_modules/.pnpm/lucide-react@0.513.0_react@17.0.2/node_modules/lucide-react/dist/esm/createLucideIcon.js
+;// ../node_modules/lucide-react/dist/esm/createLucideIcon.js
 /**
  * @license lucide-react v0.513.0 - ISC
  *
@@ -146,7 +146,7 @@ const createLucideIcon = (iconName, iconNode) => {
 
 //# sourceMappingURL=createLucideIcon.js.map
 
-;// ../node_modules/.pnpm/lucide-react@0.513.0_react@17.0.2/node_modules/lucide-react/dist/esm/icons/circle-help.js
+;// ../node_modules/lucide-react/dist/esm/icons/circle-help.js
 /**
  * @license lucide-react v0.513.0 - ISC
  *
@@ -168,18 +168,18 @@ const CircleHelp = createLucideIcon("circle-help", __iconNode);
 
 // EXTERNAL MODULE: external "@grafana/ui"
 var ui_ = __webpack_require__(2007);
-// EXTERNAL MODULE: ../node_modules/.pnpm/jotai@2.15.0_@babel+core@7.28.4_@babel+template@7.27.2_@types+react@19.2.2_react@17.0.2/node_modules/jotai/esm/react.mjs
-var react = __webpack_require__(122);
-// EXTERNAL MODULE: ../node_modules/.pnpm/antd@5.27.6_date-fns@2.30.0_moment@2.29.4_react-dom@17.0.2_react@17.0.2__react@17.0.2/node_modules/antd/es/tooltip/index.js + 91 modules
-var tooltip = __webpack_require__(8644);
+// EXTERNAL MODULE: ../node_modules/jotai/esm/react.mjs
+var react = __webpack_require__(3689);
+// EXTERNAL MODULE: ../node_modules/antd/es/tooltip/index.js + 90 modules
+var tooltip = __webpack_require__(5395);
 // EXTERNAL MODULE: ./store/traces.ts
-var store_traces = __webpack_require__(8882);
+var store_traces = __webpack_require__(3982);
 // EXTERNAL MODULE: external "@emotion/css"
 var css_ = __webpack_require__(6089);
 // EXTERNAL MODULE: ./store/discover.ts
-var discover = __webpack_require__(2539);
+var discover = __webpack_require__(6247);
 // EXTERNAL MODULE: ./utils/utils.ts
-var utils = __webpack_require__(8763);
+var utils = __webpack_require__(2551);
 ;// ./components/traces/search-sidebar/index.tsx
 'use client';
 
@@ -409,10 +409,10 @@ const TraceItem = ({ trace, onClick })=>{
     }, trace.timeAgo)))));
 };
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/echarts-for-react@3.0.2_echarts@5.6.0_react@17.0.2/node_modules/echarts-for-react/esm/index.js + 557 modules
-var esm = __webpack_require__(4059);
+// EXTERNAL MODULE: ../node_modules/echarts-for-react/esm/index.js + 557 modules
+var esm = __webpack_require__(1244);
 // EXTERNAL MODULE: ./components/trace-detail/index.tsx
-var trace_detail = __webpack_require__(7273);
+var trace_detail = __webpack_require__(1885);
 ;// ./components/traces/traces-viewer/index.tsx
 
 
@@ -614,11 +614,11 @@ const TraceView = /*#__PURE__*/ external_react_default().memo(({ traces: propTra
     }));
 });
 
-// EXTERNAL MODULE: ../node_modules/.pnpm/dayjs@1.11.18/node_modules/dayjs/dayjs.min.js
-var dayjs_min = __webpack_require__(228);
+// EXTERNAL MODULE: ../node_modules/dayjs/dayjs.min.js
+var dayjs_min = __webpack_require__(5285);
 var dayjs_min_default = /*#__PURE__*/__webpack_require__.n(dayjs_min);
-// EXTERNAL MODULE: ../node_modules/.pnpm/@emotion+styled@11.14.1_@emotion+react@11.11.1_@types+react@19.2.2_react@17.0.2__@types+react@19.2.2_react@17.0.2/node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js + 8 modules
-var emotion_styled_browser_esm = __webpack_require__(31);
+// EXTERNAL MODULE: ../node_modules/@emotion/styled/dist/emotion-styled.browser.esm.js + 8 modules
+var emotion_styled_browser_esm = __webpack_require__(2742);
 ;// ./components/traces/traces-header/discover-header.style.ts
 
 
@@ -673,11 +673,11 @@ const CascaderStyle = (0,css_.css)`
 // EXTERNAL MODULE: external "@grafana/runtime"
 var runtime_ = __webpack_require__(8531);
 // EXTERNAL MODULE: ./utils/data.ts
-var utils_data = __webpack_require__(9008);
+var utils_data = __webpack_require__(6700);
 // EXTERNAL MODULE: ./constants.ts + 1 modules
-var constants = __webpack_require__(2560);
+var constants = __webpack_require__(2351);
 // EXTERNAL MODULE: ./services/metaservice.ts
-var metaservice = __webpack_require__(6965);
+var metaservice = __webpack_require__(8161);
 // EXTERNAL MODULE: external "@grafana/data"
 var data_ = __webpack_require__(7781);
 ;// ./components/traces/traces-header/index.tsx
@@ -1009,7 +1009,7 @@ function TracesHeader() {
 }
 
 // EXTERNAL MODULE: ./services/traces.ts + 1 modules
-var services_traces = __webpack_require__(4338);
+var services_traces = __webpack_require__(3764);
 ;// ./pages/PageTrace.tsx
 function PageTrace_define_property(obj, key, value) {
     if (key in obj) {
@@ -1363,4 +1363,4 @@ function PageTrace() {
 /***/ })
 
 }]);
-//# sourceMappingURL=824.js.map?_cache=82f7b759265fefdd1d12
+//# sourceMappingURL=600.js.map?_cache=ac24fd3c8fd2cf60b5c8
