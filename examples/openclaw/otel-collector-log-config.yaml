@@ -1,0 +1,91 @@
+# OpenClaw Log Collector Configuration
+#
+# This collector runs as a sidecar to collect OpenClaw's JSONL/text log files
+# via the filelog receiver and forwards them to the ai-observe-stack OTel Gateway.
+#
+# The community otel-observability plugin does not support Log OTLP export,
+# so logs must be collected separately from the filesystem.
+
+receivers:
+  # Structured JSONL logs (e.g. config-audit.jsonl)
+  filelog/jsonl:
+    include:
+      - /openclaw-logs/*.jsonl
+    start_at: beginning
+    operators:
+      - type: json_parser
+        timestamp:
+          parse_from: attributes.ts
+          layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+        severity:
+          parse_from: attributes.event
+      - type: move
+        from: attributes.event
+        to: attributes["log.event"]
+      - type: move
+        from: attributes.source
+        to: attributes["log.source"]
+
+  # Agent session logs (conversation history for all agents)
+  # Mount: ~/.openclaw/agents -> /openclaw-agents:ro
+  filelog/sessions:
+    include:
+      - /openclaw-agents/*/sessions/*.jsonl
+    start_at: beginning
+    operators:
+      - type: json_parser
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+        on_error: send
+      - type: add
+        field: attributes["log.source"]
+        value: session
+
+  # Plain-text gateway logs (gateway.log, gateway.err.log)
+  filelog/gateway:
+    include:
+      - /openclaw-logs/gateway.log
+      - /openclaw-logs/gateway.err.log
+    start_at: beginning
+    operators:
+      - type: regex_parser
+        regex: '^(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)\s+\[(?P<module>[^\]]+)\]\s+(?P<message>.*)'
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+        on_error: send
+      - type: move
+        from: attributes.module
+        to: attributes["log.module"]
+        on_error: send
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 100
+
+  resource:
+    attributes:
+      - key: service.name
+        value: openclaw
+        action: upsert
+      - key: service.instance.id
+        value: local
+        action: upsert
+
+exporters:
+  otlp:
+    endpoint: otel-collector:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog/jsonl, filelog/sessions, filelog/gateway]
+      processors: [resource, batch]
+      exporters: [otlp, debug]
